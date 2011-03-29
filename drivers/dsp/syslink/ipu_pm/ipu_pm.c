@@ -1863,7 +1863,7 @@ static inline int ipu_pm_rel_iva_hd(struct ipu_pm_object *handle,
 	if (params->pm_iva_hd_counter == 0 && params->pm_iss_counter == 0) {
 		pr_debug("Release MPU wakeup latency\n");
 		retval = omap_pm_set_max_mpu_wakeup_lat(&pm_qos_handle,
-						IPU_PM_NO_LAT_CONSTRAINT);
+						IPU_PM_NO_MPU_LAT_CONSTRAINT);
 		if (retval) {
 			pr_err("%s %d Error setting MPU cstr\n"
 							, __func__, __LINE__);
@@ -1983,7 +1983,7 @@ static inline int ipu_pm_rel_iss(struct ipu_pm_object *handle,
 	if (params->pm_iva_hd_counter == 0 && params->pm_iss_counter == 0) {
 		pr_debug("Release MPU wakeup latency\n");
 		retval = omap_pm_set_max_mpu_wakeup_lat(&pm_qos_handle,
-						IPU_PM_NO_LAT_CONSTRAINT);
+						IPU_PM_NO_MPU_LAT_CONSTRAINT);
 		if (retval) {
 			pr_err("%s %d Error setting MPU cstr\n"
 							, __func__, __LINE__);
@@ -2479,6 +2479,13 @@ int ipu_pm_save_ctx(int proc_id)
 		return 0;
 	}
 
+#ifdef CONFIG_OMAP_PM
+	retval = omap_pm_set_max_sdma_lat(&pm_qos_handle_2,
+						IPU_PM_NO_MPU_LAT_CONSTRAINT);
+	if (retval)
+		pr_info("Unable to remove cstr on IPU\n");
+#endif
+
 	/* Because of the current scheme, we need to check
 	 * if APPM3 is enable and we need to shut it down too
 	 * Sysm3 is the only want sending the hibernate message
@@ -2527,13 +2534,6 @@ int ipu_pm_save_ctx(int proc_id)
 		if (retval)
 			goto error;
 		handle->rcb_table->state_flag |= SYS_PROC_DOWN;
-
-#ifdef CONFIG_OMAP_PM
-		retval = omap_pm_set_max_sdma_lat(&pm_qos_handle_2,
-						IPU_PM_NO_LAT_CONSTRAINT);
-		if (retval)
-			pr_info("Unable to remove cstr on IPU\n");
-#endif
 
 		/* If there is a message in the mbox restore
 		 * immediately after save.
@@ -2611,6 +2611,12 @@ int ipu_pm_restore_ctx(int proc_id)
 		/*cm_write_mod_reg(HW_AUTO,
 				 OMAP4430_CM2_CORE_MOD,
 				 OMAP4_CM_DUCATI_CLKSTCTRL_OFFSET);*/
+#ifdef CONFIG_OMAP_PM
+		retval = omap_pm_set_max_sdma_lat(&pm_qos_handle_2,
+						IPU_PM_MM_MPU_LAT_CONSTRAINT);
+		if (retval)
+			pr_info("Unable to set cstr on IPU\n");
+#endif
 	}
 
 	/* Check if the M3 was loaded */
@@ -2664,7 +2670,7 @@ int ipu_pm_restore_ctx(int proc_id)
 #endif
 #ifdef CONFIG_OMAP_PM
 		retval = omap_pm_set_max_sdma_lat(&pm_qos_handle_2,
-						IPU_PM_MM_SDMA_LAT_CONSTRAINT);
+						IPU_PM_MM_MPU_LAT_CONSTRAINT);
 		if (retval)
 			pr_info("Unable to set cstr on IPU\n");
 #endif
@@ -2791,13 +2797,6 @@ int ipu_pm_setup(struct ipu_pm_config *cfg)
 	fdifHandle = ioremap(0x4A10A000, (sizeof(void) * 1));
 #endif
 	BLOCKING_INIT_NOTIFIER_HEAD(&ipu_pm_notifier);
-
-#ifdef CONFIG_OMAP_PM
-	retval = omap_pm_set_max_sdma_lat(&pm_qos_handle_2,
-						IPU_PM_MM_SDMA_LAT_CONSTRAINT);
-	if (retval)
-		pr_info("Unable to set cstr on IPU\n");
-#endif
 
 	return retval;
 exit:
@@ -3085,14 +3084,6 @@ int ipu_pm_destroy(void)
 exit:
 	if (retval < 0)
 		pr_err("ipu_pm_destroy failed, retval: %x\n", retval);
-
-#ifdef CONFIG_OMAP_PM
-	retval = omap_pm_set_max_sdma_lat(&pm_qos_handle_2,
-						IPU_PM_NO_LAT_CONSTRAINT);
-	if (retval)
-		pr_info("Unable to remove cstr on IPU\n");
-#endif
-
 	return retval;
 }
 EXPORT_SYMBOL(ipu_pm_destroy);
