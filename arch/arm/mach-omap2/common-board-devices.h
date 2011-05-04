@@ -67,7 +67,8 @@ void omap4_pmic_get_config(struct twl4030_platform_data *pmic_data,
 #define OMAP_DSS_SUPPLIES \
 	REGULATOR_SUPPLY("vdds_sdi", "omapdss_dss"), \
 	REGULATOR_SUPPLY("vdds_dsi", "omapdss_dss"), \
-	REGULATOR_SUPPLY("vdds_dsi", "omapdss_dsi1")
+	REGULATOR_SUPPLY("vdds_dsi", "omapdss_dsi.0"), \
+	REGULATOR_SUPPLY("vdds_dsi", "omapdss_dsi.1")
 
 #define OMAP_DSS_VENC_SUPPLIES \
 	REGULATOR_SUPPLY("vdda_dac", "omapdss_venc")
