@@ -22,8 +22,6 @@
 #include <linux/kobject.h>
 #include <linux/device.h>
 #include <linux/notifier.h>
-#include <linux/platform_device.h>
-#include <asm/atomic.h>
 
 #define DISPC_IRQ_FRAMEDONE		(1 << 0)
 #define DISPC_IRQ_VSYNC			(1 << 1)
