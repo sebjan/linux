@@ -284,6 +284,15 @@ static struct regulator_consumer_supply sdp3430_vaux3_supplies[] = {
 	REGULATOR_SUPPLY("vcc", "spi1.0"),
 };
 
+static struct regulator_consumer_supply sdp3430_vdda_dac_supplies[] = {
+	OMAP_DSS_VENC_SUPPLIES,
+};
+
+/* VPLL2 for digital video outputs */
+static struct regulator_consumer_supply sdp3430_vpll2_supplies[] = {
+	OMAP_DSS_SUPPLIES,
+};
+
 static struct regulator_consumer_supply sdp3430_vmmc1_supplies[] = {
 	REGULATOR_SUPPLY("vmmc", "omap_hsmmc.0"),
 };

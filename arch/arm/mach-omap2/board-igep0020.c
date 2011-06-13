@@ -477,6 +477,25 @@ static struct omap_dss_board_info igep2_dss_data = {
 	.default_device	= &igep2_dvi_device,
 };
 
+static struct regulator_consumer_supply igep2_vpll2_supplies[] = {
+	OMAP_DSS_SUPPLIES,
+};
+
+static struct regulator_init_data igep2_vpll2 = {
+	.constraints = {
+		.name			= "VDVI",
+		.min_uV			= 1800000,
+		.max_uV			= 1800000,
+		.apply_uV		= true,
+		.valid_modes_mask	= REGULATOR_MODE_NORMAL
+					| REGULATOR_MODE_STANDBY,
+		.valid_ops_mask		= REGULATOR_CHANGE_MODE
+					| REGULATOR_CHANGE_STATUS,
+	},
+	.num_consumer_supplies	= ARRAY_SIZE(igep2_vpll2_supplies),
+	.consumer_supplies	= igep2_vpll2_supplies,
+};
+
 static void __init igep2_display_init(void)
 {
 	int err = gpio_request_one(IGEP2_GPIO_DVI_PUP, GPIOF_OUT_INIT_HIGH,

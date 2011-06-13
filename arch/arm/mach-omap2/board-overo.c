@@ -264,6 +264,13 @@ static struct omap_dss_board_info overo_dss_data = {
 	.default_device	= &overo_dvi_device,
 };
 
+static struct regulator_consumer_supply overo_vdda_dac_supply =
+	OMAP_DSS_VENC_SUPPLIES;
+
+static struct regulator_consumer_supply overo_vdds_dsi_supply[] = {
+	OMAP_DSS_SUPPLIES,
+};
+
 static struct mtd_partition overo_nand_partitions[] = {
 	{
 		.name           = "xloader",

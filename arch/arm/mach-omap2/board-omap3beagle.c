@@ -238,6 +238,13 @@ static struct omap_dss_board_info beagle_dss_data = {
 	.default_device = &beagle_dvi_device,
 };
 
+static struct regulator_consumer_supply beagle_vdac_supply =
+	OMAP_DSS_VENC_SUPPLIES;
+
+static struct regulator_consumer_supply beagle_vdvi_supplies[] = {
+	OMAP_DSS_SUPPLIES,
+};
+
 static void __init beagle_display_init(void)
 {
 	int r;

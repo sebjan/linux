@@ -390,6 +390,55 @@ static struct twl4030_keypad_data omap3stalker_kp_data = {
 	.rep		= 1,
 };
 
+static struct twl4030_madc_platform_data omap3stalker_madc_data = {
+	.irq_line	= 1,
+};
+
+static struct twl4030_codec_audio_data omap3stalker_audio_data;
+
+static struct twl4030_codec_data omap3stalker_codec_data = {
+	.audio_mclk	= 26000000,
+	.audio		= &omap3stalker_audio_data,
+};
+
+static struct regulator_consumer_supply omap3_stalker_vdda_dac_supply =
+	OMAP_DSS_VENC_SUPPLIES;
+
+/* VDAC for DSS driving S-Video */
+static struct regulator_init_data omap3_stalker_vdac = {
+	.constraints		= {
+		.min_uV			= 1800000,
+		.max_uV			= 1800000,
+		.apply_uV		= true,
+		.valid_modes_mask	= REGULATOR_MODE_NORMAL
+		| REGULATOR_MODE_STANDBY,
+		.valid_ops_mask		= REGULATOR_CHANGE_MODE
+		| REGULATOR_CHANGE_STATUS,
+	},
+	.num_consumer_supplies	= 1,
+	.consumer_supplies	= &omap3_stalker_vdda_dac_supply,
+};
+
+/* VPLL2 for digital video outputs */
+static struct regulator_consumer_supply omap3_stalker_vpll2_supplies[] = {
+	OMAP_DSS_SUPPLIES,
+};
+
+static struct regulator_init_data omap3_stalker_vpll2 = {
+	.constraints		= {
+		.name			= "VDVI",
+		.min_uV			= 1800000,
+		.max_uV			= 1800000,
+		.apply_uV = true,
+		.valid_modes_mask	= REGULATOR_MODE_NORMAL
+		| REGULATOR_MODE_STANDBY,
+		.valid_ops_mask		= REGULATOR_CHANGE_MODE
+		| REGULATOR_CHANGE_STATUS,
+	},
+	.num_consumer_supplies	= ARRAY_SIZE(omap3_stalker_vpll2_supplies),
+	.consumer_supplies	= omap3_stalker_vpll2_supplies,
+};
+
 static struct twl4030_platform_data omap3stalker_twldata = {
 	/* platform_data for children goes here */
 	.keypad		= &omap3stalker_kp_data,

@@ -40,6 +40,8 @@
 #include <media/radio-si4713.h>
 #include <media/si4713.h>
 
+#include <video/omapdss.h>
+
 #include <../drivers/staging/iio/light/tsl2563.h>
 
 #include "mux.h"
@@ -386,9 +388,13 @@ static struct regulator_consumer_supply rx51_vio_supplies[] = {
 };
 
 static struct regulator_consumer_supply rx51_vaux1_consumers[] = {
-	REGULATOR_SUPPLY("vdds_sdi", "omapdss"),
+	OMAP_DSS_SUPPLIES,
 	/* Si4713 supply */
 	REGULATOR_SUPPLY("vdd", "2-0063"),
+};
+
+static struct regulator_consumer_supply rx51_vdac_supply[] = {
+	OMAP_DSS_VENC_SUPPLIES,
 };
 
 static struct regulator_init_data rx51_vaux1 = {

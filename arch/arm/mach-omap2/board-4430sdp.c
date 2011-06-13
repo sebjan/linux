@@ -326,8 +326,7 @@ static struct regulator_consumer_supply sdp4430_vaux_supply[] = {
 	},
 };
 static struct regulator_consumer_supply sdp4430_vcxio_supply[] = {
-	REGULATOR_SUPPLY("vdds_dsi", "omapdss_dss"),
-	REGULATOR_SUPPLY("vdds_dsi", "omapdss_dsi1"),
+	OMAP_DSS_SUPPLIES,
 };
 
 static int omap4_twl6030_hsmmc_late_init(struct device *dev)

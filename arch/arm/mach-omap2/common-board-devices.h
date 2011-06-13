@@ -64,4 +64,12 @@ void omap3_pmic_get_config(struct twl4030_platform_data *pmic_data,
 void omap4_pmic_get_config(struct twl4030_platform_data *pmic_data,
 			   u32 pdata_flags, u32 regulators_flags);
 
-#endif /* __OMAP_PMIC_COMMON_BOARD_DEVICES__ */
+#define OMAP_DSS_SUPPLIES \
+	REGULATOR_SUPPLY("vdds_sdi", "omapdss_dss"), \
+	REGULATOR_SUPPLY("vdds_dsi", "omapdss_dss"), \
+	REGULATOR_SUPPLY("vdds_dsi", "omapdss_dsi1")
+
+#define OMAP_DSS_VENC_SUPPLIES \
+	REGULATOR_SUPPLY("vdda_dac", "omapdss_venc")
+
+#endif /* __OMAP_COMMON_BOARD_DEVICES__ */
