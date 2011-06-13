@@ -51,6 +51,7 @@
 #define OMAP4_SFH7741_ENABLE_GPIO		188
 #define HDMI_GPIO_HPD 60 /* Hot plug pin for HDMI */
 #define HDMI_GPIO_LS_OE 41 /* Level shifter for HDMI */
+#define DISPLAY_SEL_GPIO	59	/* LCD2/PicoDLP switch */
 /* PWM2 and TOGGLE3 register offsets */
 #define LED_PWM2ON		0x03
 #define LED_PWM2OFF		0x04
@@ -464,7 +465,7 @@ static void __init omap_sfh7741prox_init(void)
 			__func__, OMAP4_SFH7741_ENABLE_GPIO, error);
 }
 
-static int dsi1_panel_set_backlight(struct omap_dss_device *dssdev, int level)
+static int dsi_panel_set_backlight(struct omap_dss_device *dssdev, int level)
 {
 	int r;
 
@@ -499,13 +500,13 @@ static int dsi1_panel_set_backlight(struct omap_dss_device *dssdev, int level)
 	return 0;
 }
 
-static struct nokia_dsi_panel_data dsi1_panel;
+static struct nokia_dsi_panel_data dsi1_panel, dsi2_panel;
 
 static void sdp4430_lcd_init(void)
 {
 	int status;
 
-	/* Panel Taal reset and backlight GPIO init */
+	/* Panel Taal (LCD1) reset and backlight GPIO init */
 	status = gpio_request_one(dsi1_panel.reset_gpio, GPIOF_DIR_OUT,
 		"lcd_reset_gpio");
 	if (status)
@@ -513,6 +514,24 @@ static void sdp4430_lcd_init(void)
 
 	if (dsi1_panel.use_ext_te) {
 		status = omap_mux_init_signal("gpmc_ncs4.gpio_101",
+				OMAP_PIN_INPUT_PULLUP);
+		if (status)
+			pr_err("%s: Could not get ext_te gpio\n", __func__);
+	}
+}
+
+static void sdp4430_lcd2_init(void)
+{
+	int status;
+
+	/* Panel Taal (LCD2) reset and backlight GPIO init */
+	status = gpio_request_one(dsi2_panel.reset_gpio, GPIOF_DIR_OUT,
+		"lcd2_reset_gpio");
+	if (status)
+		pr_err("%s: Could not get lcd2_reset_gpio\n", __func__);
+
+	if (dsi2_panel.use_ext_te) {
+		status = omap_mux_init_signal("gpmc_ncs6.gpio_103",
 				OMAP_PIN_INPUT_PULLUP);
 		if (status)
 			pr_err("%s: Could not get ext_te gpio\n", __func__);
@@ -562,7 +581,7 @@ static struct nokia_dsi_panel_data dsi1_panel = {
 		.use_ext_te	= false,
 		.ext_te_gpio	= 101,
 		.esd_interval	= 0,
-		.set_backlight	= dsi1_panel_set_backlight,
+		.set_backlight	= dsi_panel_set_backlight,
 };
 
 static struct omap_dss_device sdp4430_lcd_device = {
@@ -577,6 +596,8 @@ static struct omap_dss_device sdp4430_lcd_device = {
 		.data1_pol	= 0,
 		.data2_lane	= 3,
 		.data2_pol	= 0,
+
+		.module		= 0,
 	},
 
 	.clocks = {
@@ -602,6 +623,54 @@ static struct omap_dss_device sdp4430_lcd_device = {
 	.channel		= OMAP_DSS_CHANNEL_LCD,
 };
 
+static struct nokia_dsi_panel_data dsi2_panel = {
+		.name		= "taal",
+		.reset_gpio	= 104,
+		.use_ext_te	= false,
+		.ext_te_gpio	= 103,
+		.esd_interval	= 0,
+		.set_backlight	= dsi_panel_set_backlight,
+};
+
+static struct omap_dss_device sdp4430_lcd2_device = {
+	.name			= "lcd2",
+	.driver_name		= "taal",
+	.type			= OMAP_DISPLAY_TYPE_DSI,
+	.data			= &dsi2_panel,
+	.phy.dsi		= {
+		.clk_lane	= 1,
+		.clk_pol	= 0,
+		.data1_lane	= 2,
+		.data1_pol	= 0,
+		.data2_lane	= 3,
+		.data2_pol	= 0,
+
+		.module		= 1,
+	},
+
+	.clocks = {
+		.dispc = {
+			.channel = {
+				.lck_div	= 1,	/* Logic Clock = 172.8 MHz */
+				.pck_div	= 5,	/* Pixel Clock = 34.56 MHz */
+				.lcd_clk_src	= OMAP_DSS_CLK_SRC_DSI2_PLL_HSDIV_DISPC,
+			},
+			.dispc_fclk_src	= OMAP_DSS_CLK_SRC_FCK,
+		},
+
+		.dsi = {
+			.regn		= 16,	/* Fint = 2.4 MHz */
+			.regm		= 180,	/* DDR Clock = 216 MHz */
+			.regm_dispc	= 5,	/* PLL1_CLK1 = 172.8 MHz */
+			.regm_dsi	= 5,	/* PLL1_CLK2 = 172.8 MHz */
+
+			.lp_clk_div	= 10,	/* LP Clock = 8.64 MHz */
+			.dsi_fclk_src	= OMAP_DSS_CLK_SRC_DSI2_PLL_HSDIV_DSI,
+		},
+	},
+	.channel		= OMAP_DSS_CHANNEL_LCD2,
+};
+
 static struct omap_dss_device sdp4430_hdmi_device = {
 	.name = "hdmi",
 	.driver_name = "hdmi_panel",
@@ -613,6 +682,7 @@ static struct omap_dss_device sdp4430_hdmi_device = {
 
 static struct omap_dss_device *sdp4430_dss_devices[] = {
 	&sdp4430_lcd_device,
+	&sdp4430_lcd2_device,
 	&sdp4430_hdmi_device,
 };
 
@@ -622,9 +692,18 @@ static struct omap_dss_board_info sdp4430_dss_data = {
 	.default_device	= &sdp4430_lcd_device,
 };
 
-void omap_4430sdp_display_init(void)
+static void omap_4430sdp_display_init(void)
 {
+	int r;
+
+	/* Enable LCD2 by default (instead of Pico DLP) */
+	r = gpio_request_one(DISPLAY_SEL_GPIO, GPIOF_OUT_INIT_HIGH,
+			"display_sel");
+	if (r)
+		pr_err("%s: Could not get display_sel GPIO\n", __func__);
+
 	sdp4430_lcd_init();
+	sdp4430_lcd2_init();
 	sdp4430_hdmi_mux_init();
 	omap_display_init(&sdp4430_dss_data);
 }
