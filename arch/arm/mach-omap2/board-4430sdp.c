@@ -42,7 +42,6 @@
 #include "mux.h"
 #include "hsmmc.h"
 #include "timer-gp.h"
-#include "control.h"
 #include "common-board-devices.h"
 
 #define ETH_KS8851_IRQ			34
@@ -505,16 +504,7 @@ static struct nokia_dsi_panel_data dsi1_panel;
 
 static void sdp4430_lcd_init(void)
 {
-	u32 reg;
 	int status;
-
-	/* Enable 3 lanes in DSI1 module, disable pull down */
-	reg = omap4_ctrl_pad_readl(OMAP4_CTRL_MODULE_PAD_CORE_CONTROL_DSIPHY);
-	reg &= ~OMAP4_DSI1_LANEENABLE_MASK;
-	reg |= 0x7 << OMAP4_DSI1_LANEENABLE_SHIFT;
-	reg &= ~OMAP4_DSI1_PIPD_MASK;
-	reg |= 0x7 << OMAP4_DSI1_PIPD_SHIFT;
-	omap4_ctrl_pad_writel(reg, OMAP4_CTRL_MODULE_PAD_CORE_CONTROL_DSIPHY);
 
 	/* Panel Taal reset and backlight GPIO init */
 	status = gpio_request_one(dsi1_panel.reset_gpio, GPIOF_DIR_OUT,
