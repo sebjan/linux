@@ -22,6 +22,7 @@
 #include <mach/board-rx51.h>
 
 #include "mux.h"
+#include "common-board-devices.h"
 
 #define RX51_LCD_RESET_GPIO	90
 

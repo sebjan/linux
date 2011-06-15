@@ -17,6 +17,8 @@
 #include <plat/mcspi.h>
 #include <video/omapdss.h>
 
+#include "common-board-devices.h"
+
 #define LCD_PANEL_RESET_GPIO_PROD	96
 #define LCD_PANEL_RESET_GPIO_PILOT	55
 #define LCD_PANEL_QVGA_GPIO		56

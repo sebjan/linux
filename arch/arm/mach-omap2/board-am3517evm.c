@@ -39,6 +39,7 @@
 
 #include "mux.h"
 #include "control.h"
+#include "common-board-devices.h"
 
 #define AM35XX_EVM_MDIO_FREQUENCY	(1000000)
 

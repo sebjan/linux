@@ -73,4 +73,16 @@ void omap4_pmic_get_config(struct twl4030_platform_data *pmic_data,
 #define OMAP_DSS_VENC_SUPPLIES \
 	REGULATOR_SUPPLY("vdda_dac", "omapdss_venc")
 
+struct omap_dss_board_info;
+
+#if defined(CONFIG_OMAP2_DSS_MODULE) || defined(CONFIG_OMAP2_DSS)
+/* Init with the board info */
+extern int omap_display_init(struct omap_dss_board_info *board_data);
+#else
+static inline int omap_display_init(struct omap_dss_board_info *board_data)
+{
+	return 0;
+}
+#endif
+
 #endif /* __OMAP_COMMON_BOARD_DEVICES__ */
