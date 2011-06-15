@@ -51,7 +51,6 @@
 #define OMAP4_SFH7741_ENABLE_GPIO		188
 #define HDMI_GPIO_HPD 60 /* Hot plug pin for HDMI */
 #define HDMI_GPIO_LS_OE 41 /* Level shifter for HDMI */
-#define LCD_BL_GPIO		27	/* LCD Backlight GPIO */
 /* PWM2 and TOGGLE3 register offsets */
 #define LED_PWM2ON		0x03
 #define LED_PWM2OFF		0x04
@@ -518,12 +517,6 @@ static void sdp4430_lcd_init(void)
 		if (status)
 			pr_err("%s: Could not get ext_te gpio\n", __func__);
 	}
-
-	status = gpio_request_one(LCD_BL_GPIO, GPIOF_DIR_OUT, "lcd_bl_gpio");
-	if (status)
-		pr_err("%s: Could not get lcd_bl_gpio\n", __func__);
-
-	gpio_set_value(LCD_BL_GPIO, 0);
 }
 
 static void sdp4430_hdmi_mux_init(void)
