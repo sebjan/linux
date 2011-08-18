@@ -32,7 +32,7 @@
 #include "omap4-sar-layout.h"
 
 #ifdef CONFIG_CACHE_L2X0
-#define L2X0_POR_OFFSET_VALUE		0x9
+#define L2X0_POR_OFFSET_VALUE		0x7
 void __iomem *l2cache_base;
 #endif
 
