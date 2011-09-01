@@ -1340,8 +1340,8 @@ static inline int ipu_pm_get_iva_hd(struct ipu_pm_object *handle,
 		return PM_UNSUPPORTED;
 	}
 	/* set Next State to INACTIVE for IVAHD */
-	prm_write_mod_reg(0xff0e02,
-			 OMAP4430_PRM_IVAHD_MOD,
+	omap4_prm_write_inst_reg(0xff0e02,
+			 OMAP4430_PRM_IVAHD_INST,
 			 OMAP4_PM_IVAHD_PWRSTCTRL_OFFSET);
 
 	params->pm_iva_hd_counter++;
