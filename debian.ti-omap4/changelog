@@ -1,3 +1,11 @@
+linux-ti-omap4 (3.0.0-1280.2) oneiric; urgency=low
+
+  [ Sebastien Jan ]
+
+  * Config: Add DHCP support
+
+ -- Sebastien JAN <s-jan@ti.com>  Fri, 02 Sep 2011 16:15:38 +0200
+
 linux-ti-omap4 (3.0.0-1280.1) oneiric; urgency=low
 
 
