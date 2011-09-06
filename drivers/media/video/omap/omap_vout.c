@@ -2568,6 +2568,13 @@ static int __init omap_vout_probe(struct platform_device *pdev)
 					OMAP_DSS_DISPLAY_CAP_MANUAL_UPDATE) {
 				if (dssdrv->enable_te)
 					dssdrv->enable_te(def_display, 0);
+				if (dssdrv->set_update_mode)
+					dssdrv->set_update_mode(def_display,
+							OMAP_DSS_UPDATE_MANUAL);
+			} else {
+				if (dssdrv->set_update_mode)
+					dssdrv->set_update_mode(def_display,
+							OMAP_DSS_UPDATE_AUTO);
 			}
 		}
 	}
