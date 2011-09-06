@@ -435,16 +435,7 @@ static struct twl4030_keypad_data omap3evm_kp_data = {
 	.rep		= 1,
 };
 
-static struct twl4030_madc_platform_data omap3evm_madc_data = {
-	.irq_line	= 1,
-};
-
 static struct twl4030_codec_audio_data omap3evm_audio_data;
-
-static struct twl4030_codec_data omap3evm_codec_data = {
-	.audio_mclk = 26000000,
-	.audio = &omap3evm_audio_data,
-};
 
 static struct regulator_consumer_supply omap3_evm_vdda_dac_supply =
 	OMAP_DSS_VENC_SUPPLIES;
