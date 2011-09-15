@@ -217,7 +217,7 @@ static int omap_connector_scaler_modes_add(struct drm_connector *connector)
 	return modes;
 }
 
-#define MAX_EDID  256
+#define MAX_EDID  512
 
 static int omap_connector_get_modes(struct drm_connector *connector)
 {
