@@ -1091,14 +1091,17 @@ static int taal_probe(struct omap_dss_device *dssdev)
 					taal_te_timeout_work_callback);
 
 		if (td->force_update) {
+			printk(KERN_ERR "sebj - %s - channel=%s\n", __func__, dssdev->channel);
 			if (dssdev->channel == OMAP_DSS_CHANNEL_LCD) {
 				td->te_wq = create_singlethread_workqueue("taal wq");
 				INIT_WORK(&td->te_framedone_work,
 					te_work_callback);
+			printk(KERN_ERR "sebj - %s - init WQ for LCD 1 !\n", __func__);
 			} else {
 				td->te_wq = create_singlethread_workqueue("taal2 wq");
 				INIT_WORK(&td->te_framedone_work,
 					te2_work_callback);
+			printk(KERN_ERR "sebj - %s - init WQ for LCD 2 !\n", __func__);
 			}
 		}
 
@@ -1171,8 +1174,10 @@ static void __exit taal_remove(struct omap_dss_device *dssdev)
 	taal_cancel_esd_work(dssdev);
 	destroy_workqueue(td->workqueue);
 
-	if (td->force_update)
+	if (td->force_update) {
 		destroy_workqueue(td->te_wq);
+		printk(KERN_ERR "sebj - %s\n", __func__);
+	}
 
 	/* reset, to be sure that the panel is in a valid state */
 	taal_hw_reset(dssdev);
@@ -1293,6 +1298,7 @@ static void taal_prepare_workqueue(struct omap_dss_device *dssdev)
 {
 	struct taal_data *td = dev_get_drvdata(&dssdev->dev);
 
+printk(KERN_ERR "sebj - %s - channel=%d\n", __func__, dssdev->channel);
 	if (dssdev->channel == OMAP_DSS_CHANNEL_LCD)
 		td->te_wq = create_singlethread_workqueue("taal wq");
 	else
@@ -1322,6 +1328,7 @@ static int taal_enable(struct omap_dss_device *dssdev)
 		goto err;
 	}
 
+	printk(KERN_ERR "sebj - %s\n", __func__);
 	if (td->force_update) {
 		td->te_enabled = 1;
 		taal_prepare_workqueue(dssdev);
@@ -1362,6 +1369,7 @@ static void taal_disable(struct omap_dss_device *dssdev)
 		_taal_enable_te(dssdev, 0);
 		dsi_bus_unlock(dssdev);
 		destroy_workqueue(td->te_wq);
+		printk(KERN_ERR "sebj - %s\n", __func__);
 	}
 
 	if (td->force_update)
@@ -1472,6 +1480,7 @@ static void te_work_callback(struct work_struct *work)
 	u16 x_res = dssdev->panel.timings.x_res;
 	u16 y_res = dssdev->panel.timings.y_res;
 
+	printk(KERN_ERR "sebj - %s\n", __func__);
 	taal_update(dssdev, 0, 0, x_res, y_res);
 }
 
@@ -1483,6 +1492,7 @@ static void te2_work_callback(struct work_struct *work)
 	u16 x_res = dssdev->panel.timings.x_res;
 	u16 y_res = dssdev->panel.timings.y_res;
 
+	printk(KERN_ERR "sebj - %s\n", __func__);
 	taal_update(dssdev, 0, 0, x_res, y_res);
 }
 static irqreturn_t taal_te_isr(int irq, void *data)
@@ -1493,6 +1503,7 @@ static irqreturn_t taal_te_isr(int irq, void *data)
 	int r;
 
 	if (td->force_update) {
+	printk(KERN_ERR "sebj - %s\n", __func__);
 		queue_work(td->te_wq, &td->te_framedone_work);
 		return IRQ_HANDLED;
 	}
