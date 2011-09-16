@@ -204,6 +204,4 @@ void __cpuinit twd_timer_setup(struct clock_event_device *clk)
 	gic_enable_ppi(clk->irq);
 
 	__get_cpu_var(twd_ce) = clk;
-
-	clockevents_register_device(clk);
 }
