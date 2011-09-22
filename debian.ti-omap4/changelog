@@ -1,3 +1,22 @@
+linux-ti-omap4 (3.0.0-1280.3) oneiric; urgency=low
+
+  [ Sebastien Jan ]
+
+  * Config: Enable MUSB in OTG mode
+
+  [ Upstream Kernel Changes ]
+
+  * Revert "fix: remove duplicate hwspinlock source"
+  * Tiler: Change tiler_mmap from uncached to writecombine
+  * KS8851: Add support for EEPROM MAC Address
+  * hwspinlock: deactivate upstream implementation
+  * hwmod: add missing ipu addresses
+  * omap4: remoteproc: return proper status for status and stop
+  * ducati: switch clockdomain to SW managed
+  * ARM: cache-l2x0: update workaround for PL310 errata 727915
+
+ -- Sebastien JAN <s-jan@ti.com>  Thu, 22 Sep 2011 18:25:58 +0200
+
 linux-ti-omap4 (3.0.0-1280.2) oneiric; urgency=low
 
   [ Sebastien Jan ]
