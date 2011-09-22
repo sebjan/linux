@@ -1943,6 +1943,7 @@ EXPORT_SYMBOL vmlinux 0x715aea6f	inode_init_once
 EXPORT_SYMBOL vmlinux 0x7171121c	overflowgid
 EXPORT_SYMBOL vmlinux 0x718371f1	key_reject_and_link
 EXPORT_SYMBOL vmlinux 0x718f7bfd	freeze_super
+EXPORT_SYMBOL vmlinux 0x7197541c	usb_gadget_probe_driver
 EXPORT_SYMBOL vmlinux 0x71a50dbc	register_blkdev
 EXPORT_SYMBOL vmlinux 0x71a5bdfc	cdev_alloc
 EXPORT_SYMBOL vmlinux 0x71b9fd1a	jbd2_journal_abort
@@ -1992,6 +1993,7 @@ EXPORT_SYMBOL vmlinux 0x741e68da	read_cache_page
 EXPORT_SYMBOL vmlinux 0x7453d793	dev_get_by_index
 EXPORT_SYMBOL vmlinux 0x7485e15e	unregister_chrdev_region
 EXPORT_SYMBOL vmlinux 0x7497fcec	jbd2_journal_destroy
+EXPORT_SYMBOL vmlinux 0x74bb1560	usb_gadget_unregister_driver
 EXPORT_SYMBOL vmlinux 0x74c134b9	__sw_hweight32
 EXPORT_SYMBOL vmlinux 0x74c60c10	sk_prot_clear_portaddr_nulls
 EXPORT_SYMBOL vmlinux 0x74cc1cbe	unregister_cpu_notifier
@@ -2456,7 +2458,6 @@ EXPORT_SYMBOL vmlinux 0x905f7e5a	dentry_update_name_case
 EXPORT_SYMBOL vmlinux 0x90659895	cfg80211_cqm_pktloss_notify
 EXPORT_SYMBOL vmlinux 0x907f197f	proc_mkdir
 EXPORT_SYMBOL vmlinux 0x9093f313	try_to_free_buffers
-EXPORT_SYMBOL vmlinux 0x90a1aad5	usb_gadget_unregister_driver
 EXPORT_SYMBOL vmlinux 0x90adfc47	drm_calc_vbltimestamp_from_scanoutpos
 EXPORT_SYMBOL vmlinux 0x90b47741	devm_free_irq
 EXPORT_SYMBOL vmlinux 0x90c32d03	tty_check_change
@@ -2896,7 +2897,6 @@ EXPORT_SYMBOL vmlinux 0xaaaeba9e	flexonenand_region
 EXPORT_SYMBOL vmlinux 0xaab9f7e7	node_states
 EXPORT_SYMBOL vmlinux 0xaac2a52e	ieee80211_data_from_8023
 EXPORT_SYMBOL vmlinux 0xaac2c0ee	clocksource_unregister
-EXPORT_SYMBOL vmlinux 0xaacdd83f	usb_gadget_probe_driver
 EXPORT_SYMBOL vmlinux 0xaae9787e	kmem_cache_free
 EXPORT_SYMBOL vmlinux 0xaaebe232	__bug
 EXPORT_SYMBOL vmlinux 0xaafce751	tiler_map_1d_block
@@ -5095,6 +5095,7 @@ EXPORT_SYMBOL_GPL vmlinux 0x5f527bc1	usb_init_urb
 EXPORT_SYMBOL_GPL vmlinux 0x5f5c0703	omap_dm_timer_set_int_enable
 EXPORT_SYMBOL_GPL vmlinux 0x5f7ac96f	device_wakeup_disable
 EXPORT_SYMBOL_GPL vmlinux 0x5fa42d82	inet_unhash
+EXPORT_SYMBOL_GPL vmlinux 0x5fc6fe9c	musb_interrupt
 EXPORT_SYMBOL_GPL vmlinux 0x5fcdec5d	xfrm_ealg_get_byidx
 EXPORT_SYMBOL_GPL vmlinux 0x601cf502	__videobuf_mmap_setup
 EXPORT_SYMBOL_GPL vmlinux 0x60506751	unmap_kernel_range_noflush
