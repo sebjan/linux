@@ -18,6 +18,8 @@
 #include <linux/kernel.h>
 #include <linux/i2c/twl.h>
 
+#include <plat/cpu.h>
+
 #include "voltage.h"
 
 #include "pm.h"
