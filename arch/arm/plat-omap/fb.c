@@ -427,7 +427,7 @@ unsigned long __init omapfb_reserve_sram(unsigned long sram_pstart,
 #if defined(CONFIG_DRM_OMAP) || (CONFIG_DRM_OMAP_MODULE)
 
 static struct platform_device omap_drm_device = {
-		.name = "omapdrm",
+		.name = "omap_gpu",
 		.id = 0,
 };
 
