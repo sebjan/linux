@@ -23,7 +23,7 @@
 #include "drm_crtc_helper.h"
 #include "drm_fb_helper.h"
 
-#define DRIVER_NAME		MODULE_NAME
+#define DRIVER_NAME		"omap_gpu"
 #define PVR_DRIVER_NAME		"pvrsrvkm"
 #define DRIVER_DESC		"OMAP DRM"
 #define DRIVER_DATE		"20110403"
