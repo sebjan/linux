@@ -1,3 +1,11 @@
+linux-ti-omap4 (3.0.0-1280.4) oneiric; urgency=low
+
+  [ Upstream Kernel Changes ]
+
+  * OMAP2+: mailbox: fix lookups for multiple mailboxes
+
+ -- Sebastien JAN <s-jan@ti.com>  Mon, 26 Sep 2011 14:39:43 +0200
+
 linux-ti-omap4 (3.0.0-1280.3) oneiric; urgency=low
 
   [ Sebastien Jan ]
