@@ -664,6 +664,10 @@ struct twl4030_codec_data {
 	unsigned int check_defaults:1;
 	unsigned int reset_registers:1;
 	unsigned int hs_extmute:1;
+	u16 hs_left_step;
+	u16 hs_right_step;
+	u16 hf_left_step;
+	u16 hf_right_step;
 	void (*set_hs_extmute)(int mute);
 };
 
@@ -838,29 +842,5 @@ static inline int twl4030charger_usb_en(int enable) { return 0; }
 #define TWL6025_REG_SMPS4	59
 #define TWL6025_REG_VIO		60
 
-
-#define TWL_COMMON_PDATA_USB            (1 << 0)                                
-#define TWL_COMMON_PDATA_BCI            (1 << 1)                                
-#define TWL_COMMON_PDATA_MADC           (1 << 2)                                
-#define TWL_COMMON_PDATA_AUDIO          (1 << 3)                                
-                                                                                
-/* Common LDO regulators for TWL4030/TWL6030 */                                 
-#define TWL_COMMON_REGULATOR_VDAC       (1 << 0)                                
-#define TWL_COMMON_REGULATOR_VAUX1      (1 << 1)                                
-#define TWL_COMMON_REGULATOR_VAUX2      (1 << 2)                                
-#define TWL_COMMON_REGULATOR_VAUX3      (1 << 3)                                
-                                                                                
-/* TWL6030 LDO regulators */                                                    
-#define TWL_COMMON_REGULATOR_VMMC       (1 << 4)                                
-#define TWL_COMMON_REGULATOR_VPP        (1 << 5)                                
-#define TWL_COMMON_REGULATOR_VUSIM      (1 << 6)                                
-#define TWL_COMMON_REGULATOR_VANA       (1 << 7)                                
-#define TWL_COMMON_REGULATOR_VCXIO      (1 << 8)                                
-#define TWL_COMMON_REGULATOR_VUSB       (1 << 9)                                
-#define TWL_COMMON_REGULATOR_CLK32KG    (1 << 10)                               
-                                                                                
-/* TWL4030 LDO regulators */                                                    
-#define TWL_COMMON_REGULATOR_VPLL1      (1 << 4)                                
-#define TWL_COMMON_REGULATOR_VPLL2      (1 << 5)
 
 #endif /* End of __TWL4030_H */
