@@ -1,3 +1,13 @@
+linux-ti-omap4 (3.0.0-1280.6) oneiric; urgency=low
+
+  [ Upstream Kernel Changes ]
+
+  * Revert "Staging: OMAPDRM: Changing driver's name to be compatible with
+    userspace"
+  * Revert "DRM: OMAP: Fixing PVR kernel module name"
+
+ -- Sebastien JAN <s-jan@ti.com>  Tue, 27 Sep 2011 12:36:10 +0200
+
 linux-ti-omap4 (3.0.0-1280.5) oneiric; urgency=low
 
   [ Sebastien Jan ]
