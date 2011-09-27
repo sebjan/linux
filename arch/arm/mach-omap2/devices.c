@@ -729,7 +729,7 @@ static void omap_init_gpu(void)
 	char oh_name[max_omap_drm_hwmod_name_len];
 	int l;
 	struct gpu_platform_data *pdata;
-	char *name = "pvrsrvkm";
+	char *name = "omapdrm_pvr";
 
 	l = snprintf(oh_name, max_omap_drm_hwmod_name_len,
 		     "gpu");
