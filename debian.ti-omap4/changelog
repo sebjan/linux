@@ -1,3 +1,15 @@
+linux-ti-omap4 (3.0.0-1205.11) oneiric; urgency=low
+
+  [ Upstream Kernel Changes ]
+
+  * Revert "Staging: OMAPDRM: Changing driver's name to be compatible with
+    userspace"
+  * Revert "DRM: OMAP: Fixing PVR kernel module name"
+  * KBuild: Allow scripts/* to be cross compiled
+  * LINARO: Use KBUILD_SCRIPTROOT to cross build scripts
+
+ -- Sebastien JAN <s-jan@ti.com>  Wed, 28 Sep 2011 18:39:24 +0200
+
 linux-ti-omap4 (3.0.0-1205.10) oneiric; urgency=low
 
   [ Paolo Pisati ]
