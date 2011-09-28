@@ -1,3 +1,12 @@
+linux-ti-omap4 (3.0.0-1280.7) oneiric; urgency=low
+
+  [ Upstream Kernel Changes ]
+
+  * KBuild: Allow scripts/* to be cross compiled
+  * LINARO: Use KBUILD_SCRIPTROOT to cross build scripts
+
+ -- Sebastien JAN <s-jan@ti.com>  Wed, 28 Sep 2011 14:39:43 +0200
+
 linux-ti-omap4 (3.0.0-1280.6) oneiric; urgency=low
 
   [ Upstream Kernel Changes ]
