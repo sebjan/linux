@@ -1,3 +1,11 @@
+linux-ti-omap4 (3.0.0-1280.8) oneiric; urgency=low
+
+  [ Sebastien Jan ]
+
+  * Config: deactivate suspend
+
+ -- Sebastien JAN <s-jan@ti.com>  Fri, 30 Sep 2011 11:01:16 +0200
+
 linux-ti-omap4 (3.0.0-1280.7) oneiric; urgency=low
 
   [ Upstream Kernel Changes ]
