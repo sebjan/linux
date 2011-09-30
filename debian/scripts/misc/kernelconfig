@@ -84,7 +84,7 @@ for arch in $archs; do
 		if [ -f $archconfdir/$config ]; then
 			fullconf="$tmpdir/$arch-$config-full"
 			cat "$fullconf" > build/.config
-			# Call oldconfig or menuconfig
+			# Call oldconfig or xconfig
 			case "$mode" in
 			    editconfigs)
 				# Interactively edit config parameters
@@ -94,7 +94,7 @@ for arch in $archs; do
 					
 					case "$choice" in
 					y* | Y* | "" )
-						make O=`pwd`/build ARCH=$kernarch menuconfig
+						make O=`pwd`/build ARCH=$kernarch xconfig
 						break ;;
 					n* | N* )
 						break ;;
