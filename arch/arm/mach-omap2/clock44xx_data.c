@@ -3200,6 +3200,7 @@ static struct omap_clk omap44xx_clks[] = {
 	CLK(NULL,	"bandgap_fclk",			&bandgap_fclk,	CK_44XX),
 	CLK(NULL,	"bandgap_ts_fclk",		&bandgap_ts_fclk,	CK_446X),
 	CLK(NULL,	"des3des_fck",			&des3des_fck,	CK_44XX),
+	CLK("omap_temp_sensor.0",       "fck",                  &div_ts_ck,     CK_446X),
 	CLK(NULL,	"dmic_sync_mux_ck",		&dmic_sync_mux_ck,	CK_44XX),
 	CLK(NULL,	"dmic_fck",			&dmic_fck,	CK_44XX),
 	CLK(NULL,	"dsp_fck",			&dsp_fck,	CK_44XX),
