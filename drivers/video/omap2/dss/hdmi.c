@@ -168,7 +168,7 @@ static inline int hdmi_wait_for_bit_change(const struct hdmi_reg idx,
 	u32 t = 0;
 	while (val != REG_GET(idx, b2, b1)) {
 		udelay(1);
-		if (t++ > 10000)
+		if (t++ > 20000)
 			return !val;
 	}
 	return val;
@@ -344,28 +344,55 @@ static int hdmi_phy_init(void)
 	return 0;
 }
 
-static int hdmi_pll_program(struct hdmi_pll_info *fmt)
+static int hdmi_wait_softreset(void)
 {
-	u16 r = 0;
-	enum hdmi_clk_refsel refsel;
+	/* reset W1 */
+	REG_FLD_MOD(HDMI_WP_SYSCONFIG, 0x1, 0, 0);
+
+	/* wait till SOFTRESET == 0 */
+	if (hdmi_wait_for_bit_change(HDMI_WP_SYSCONFIG, 0, 0, 0) != 0) {
+		DSSERR("sysconfig reset failed\n");
+		return -ETIMEDOUT;
+	}
+
+	return 0;
+}
+
+ static int hdmi_pll_program(struct hdmi_pll_info *fmt)
+ {
+ 	u16 r = 0;
+ 	enum hdmi_clk_refsel refsel;
+ 
+	/* wait for wrapper reset */
+	r = hdmi_wait_softreset();
+	if (r)
+		return r;
 
 	r = hdmi_set_pll_pwr(HDMI_PLLPWRCMD_ALLOFF);
-	if (r)
+	if (r) {
+		pr_err("hdmi_set_pll_pwr says %d\n", r);
 		return r;
+	}
 
 	r = hdmi_set_pll_pwr(HDMI_PLLPWRCMD_BOTHON_ALLCLKS);
-	if (r)
+	if (r) {
+		pr_err("hdmi_set_pll_pwr on says %d\n", r);
 		return r;
+	}
 
 	r = hdmi_pll_reset();
-	if (r)
+	if (r) {
+		pr_err("hdmi_pll_reset says %d\n", r);
 		return r;
+	}
 
 	refsel = HDMI_REFSEL_SYSCLK;
 
 	r = hdmi_pll_init(refsel, fmt->dcofreq, fmt, fmt->regsd);
-	if (r)
+	if (r) {
+		pr_err("hdmi_pll_init says %d\n", r);
 		return r;
+	}
 
 	return 0;
 }
