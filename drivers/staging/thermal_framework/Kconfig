@@ -10,6 +10,4 @@ menuconfig THERMAL_FRAMEWORK
 	  to register and pass data to.
 
 
-source "drivers/staging/thermal_framework/sensor/Kconfig"
-
 source "drivers/staging/thermal_framework/governor/Kconfig"
