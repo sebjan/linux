@@ -762,8 +762,6 @@ static void __init omap4_panda_init(void)
 
 //	PVRCore_Init();
 
-	omap4_audio_conf();
-
 	platform_add_devices(panda_devices, ARRAY_SIZE(panda_devices));
 	panda_leds_init();
 	platform_device_register(&omap_vwlan_device);
