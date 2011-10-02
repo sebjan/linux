@@ -316,71 +316,6 @@ int omapfb_update_window(struct fb_info *fbi,
 }
 EXPORT_SYMBOL(omapfb_update_window);
 
-int omapfb_set_update_mode(struct fb_info *fbi,
-				   enum omapfb_update_mode mode)
-{
-	struct omap_dss_device *display = fb2display(fbi);
-	struct omapfb_info *ofbi = FB2OFB(fbi);
-	struct omapfb2_device *fbdev = ofbi->fbdev;
-	struct omapfb_display_data *d;
-	int r;
-
-	if (!display)
-		return -EINVAL;
-
-	if (mode != OMAPFB_AUTO_UPDATE && mode != OMAPFB_MANUAL_UPDATE)
-		return -EINVAL;
-
-	omapfb_lock(fbdev);
-
-	d = get_display_data(fbdev, display);
-
-	if (d->update_mode == mode) {
-		omapfb_unlock(fbdev);
-		return 0;
-	}
-
-	r = 0;
-
-	if (display->caps & OMAP_DSS_DISPLAY_CAP_MANUAL_UPDATE) {
-		if (mode == OMAPFB_AUTO_UPDATE)
-			omapfb_start_auto_update(fbdev, display);
-		else /* MANUAL_UPDATE */
-			omapfb_stop_auto_update(fbdev, display);
-
-		d->update_mode = mode;
-	} else { /* AUTO_UPDATE */
-		if (mode == OMAPFB_MANUAL_UPDATE)
-			r = -EINVAL;
-	}
-
-	omapfb_unlock(fbdev);
-
-	return r;
-}
-
-int omapfb_get_update_mode(struct fb_info *fbi,
-		enum omapfb_update_mode *mode)
-{
-	struct omap_dss_device *display = fb2display(fbi);
-	struct omapfb_info *ofbi = FB2OFB(fbi);
-	struct omapfb2_device *fbdev = ofbi->fbdev;
-	struct omapfb_display_data *d;
-
-	if (!display)
-		return -EINVAL;
-
-	omapfb_lock(fbdev);
-
-	d = get_display_data(fbdev, display);
-
-	*mode = d->update_mode;
-
-	omapfb_unlock(fbdev);
-
-	return 0;
-}
-
 /* XXX this color key handling is a hack... */
 static struct omapfb_color_key omapfb_color_keys[2];
 
@@ -604,7 +539,6 @@ int omapfb_ioctl(struct fb_info *fbi, unsigned int cmd, unsigned long arg)
 		struct omapfb_mem_info          mem_info;
 		struct omapfb_color_key		color_key;
 		struct omapfb_ovl_colormode	ovl_colormode;
-		enum omapfb_update_mode		update_mode;
 		int test_num;
 		struct omapfb_memory_read	memory_read;
 		struct omapfb_vram_info		vram_info;
@@ -734,20 +668,12 @@ int omapfb_ioctl(struct fb_info *fbi, unsigned int cmd, unsigned long arg)
 
 	case OMAPFB_SET_UPDATE_MODE:
 		DBG("ioctl SET_UPDATE_MODE\n");
-		if (get_user(p.update_mode, (int __user *)arg))
-			r = -EFAULT;
-		else
-			r = omapfb_set_update_mode(fbi, p.update_mode);
+		r = -EFAULT;
 		break;
 
 	case OMAPFB_GET_UPDATE_MODE:
 		DBG("ioctl GET_UPDATE_MODE\n");
-		r = omapfb_get_update_mode(fbi, &p.update_mode);
-		if (r)
-			break;
-		if (put_user(p.update_mode,
-					(enum omapfb_update_mode __user *)arg))
-			r = -EFAULT;
+		r = -EFAULT;
 		break;
 
 	case OMAPFB_SET_COLOR_KEY:

@@ -278,12 +278,7 @@ void OMAPLFBPresentSyncAddr(OMAPLFB_DEVINFO *psDevInfo,
 	driver = display->driver;
 	manager = display->manager;
 
-	if (driver && driver->sync &&
-		driver->get_update_mode(display) == OMAP_DSS_UPDATE_MANUAL) {
-		/* Wait first for the DSI bus to be released then update */
-		err = driver->sync(display);
-		OMAPLFBFlipNoLock(psDevInfo->psSwapChain, paddr);
-	} else if (manager && manager->wait_for_vsync) {
+	if (manager && manager->wait_for_vsync) {
 		/*
 		 * Update the video pipelines registers then wait until the
 		 * frame is shown with a VSYNC

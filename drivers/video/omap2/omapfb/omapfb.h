@@ -77,7 +77,6 @@ struct omapfb_display_data {
 	struct omapfb2_device *fbdev;
 	struct omap_dss_device *dssdev;
 	u8 bpp_override;
-	enum omapfb_update_mode update_mode;
 	bool auto_update_work_enabled;
 	struct delayed_work auto_update_work;
 };
@@ -137,8 +136,6 @@ void omapfb_start_auto_update(struct omapfb2_device *fbdev,
 		struct omap_dss_device *display);
 void omapfb_stop_auto_update(struct omapfb2_device *fbdev,
 		struct omap_dss_device *display);
-int omapfb_get_update_mode(struct fb_info *fbi, enum omapfb_update_mode *mode);
-int omapfb_set_update_mode(struct fb_info *fbi, enum omapfb_update_mode mode);
 
 /* find the display connected to this fb, if any */
 static inline struct omap_dss_device *fb2display(struct fb_info *fbi)
