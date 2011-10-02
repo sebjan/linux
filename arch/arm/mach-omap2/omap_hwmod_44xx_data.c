@@ -29,6 +29,7 @@
 #include <plat/mcbsp.h>
 #include <plat/mmc.h>
 #include <plat/i2c.h>
+#include <plat/temperature_sensor.h>
 
 #include "omap_hwmod_common_data.h"
 
@@ -1056,6 +1057,63 @@ static struct omap_hwmod omap44xx_aess_hwmod = {
 	.masters	= omap44xx_aess_masters,
 	.masters_cnt	= ARRAY_SIZE(omap44xx_aess_masters),
 	.omap_chip	= OMAP_CHIP_INIT(CHIP_IS_OMAP44XX),
+};
+
+/*
+ * 'temperature_sensor' class
+ * temperature sensor module inside the bandgap / control module
+ */
+
+static struct omap_hwmod_class omap44xx_temperature_sensor_hwmod_class = {
+	.name   = "temperature_sensor",
+};
+
+static struct omap_hwmod_irq_info omap44xx_temperature_sensor_irqs[] = {
+	{ .name = "thermal_alert", .irq = 126 + OMAP44XX_IRQ_GIC_START },
+};
+
+static struct omap_hwmod_addr_space omap44xx_temperature_sensor_addrs[] = {
+	{
+		.pa_start       = 0x4a00232c,
+		.pa_end         = 0x4a00238b,
+	},
+};
+
+static struct omap_hwmod omap44xx_temperature_sensor_hwmod;
+/* l4_cfg -> ctrl_module_core */
+static struct omap_hwmod_ocp_if omap44xx_l4_cfg__temperature_sensor = {
+	.master         = &omap44xx_l4_cfg_hwmod,
+	.slave          = &omap44xx_temperature_sensor_hwmod,
+	.clk            = "l4_div_ck",
+	.addr           = omap44xx_temperature_sensor_addrs,
+	.user           = OCP_USER_MPU | OCP_USER_SDMA,
+};
+
+/* ctrl_module_core slave ports */
+static struct omap_hwmod_ocp_if *omap44xx_temperature_sensor_slaves[] = {
+	&omap44xx_l4_cfg__temperature_sensor,
+};
+
+/* temperature sensor dev_attr */
+static struct omap_temp_sensor_dev_attr temp_sensor_dev_attr = {
+	.name	= "mpu",
+};
+
+static struct omap_hwmod omap44xx_temperature_sensor_hwmod = {
+	.name           = "temperature_sensor_mpu",
+	.class          = &omap44xx_temperature_sensor_hwmod_class,
+	.mpu_irqs       = omap44xx_temperature_sensor_irqs,
+	.main_clk       = "bandgap_ts_fclk",
+	.slaves		= omap44xx_temperature_sensor_slaves,
+	.slaves_cnt     = ARRAY_SIZE(omap44xx_temperature_sensor_slaves),
+	.clkdm_name     = "l4_wkup_clkdm",
+	.prcm           = {
+		.omap4 = {
+		.clkctrl_offs = OMAP4_CM_WKUP_BANDGAP_CLKCTRL_OFFSET,
+		},
+	},
+	.dev_attr	= &temp_sensor_dev_attr,
+	.omap_chip      = OMAP_CHIP_INIT(CHIP_IS_OMAP4430),
 };
 
 /*
@@ -5518,6 +5576,9 @@ static __initdata struct omap_hwmod *omap44xx_hwmods[] = {
 	&omap44xx_timer9_hwmod,
 	&omap44xx_timer10_hwmod,
 	&omap44xx_timer11_hwmod,
+
+	/* temperature sensor hwmod */
+	&omap44xx_temperature_sensor_hwmod,
 
 	/* uart class */
 	&omap44xx_uart1_hwmod,
