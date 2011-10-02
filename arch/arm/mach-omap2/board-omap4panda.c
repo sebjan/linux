@@ -71,12 +71,10 @@ static struct gpio_led gpio_leds[] = {
 	{
 		.name			= "pandaboard::status1",
 		.default_trigger	= "heartbeat",
-		.gpio			= 7,
 	},
 	{
 		.name			= "pandaboard::status2",
 		.default_trigger	= "mmc0",
-		.gpio			= 8,
 	},
 };
 
@@ -93,8 +91,20 @@ static struct platform_device leds_gpio = {
 	},
 };
 
+static void __init panda_leds_init(void)
+{
+	if (cpu_is_omap443x()) {
+		gpio_leds[0].gpio = 7;
+		gpio_leds[1].gpio = 8;
+	} else {
+		gpio_leds[0].gpio = 110;
+		gpio_leds[1].gpio = 8;
+	}
+
+	platform_device_register(&leds_gpio);
+}
+
 static struct platform_device *panda_devices[] __initdata = {
-	&leds_gpio,
 	&wl1271_device,
 };
 
@@ -656,6 +666,7 @@ static void __init omap4_panda_init(void)
 
 	omap4_panda_i2c_init();
 	platform_add_devices(panda_devices, ARRAY_SIZE(panda_devices));
+	panda_leds_init();
 	platform_device_register(&omap_vwlan_device);
 	board_serial_init();
 	omap4_twl6030_hsmmc_init(mmc);
