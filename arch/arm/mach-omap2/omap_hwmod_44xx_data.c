@@ -766,7 +766,7 @@ static struct omap_hwmod omap44xx_mpu_hwmod = {
 	},
 	.masters	= omap44xx_mpu_masters,
 	.masters_cnt	= ARRAY_SIZE(omap44xx_mpu_masters),
-	.omap_chip	= OMAP_CHIP_INIT(CHIP_IS_OMAP4430),
+	.omap_chip	= OMAP_CHIP_INIT(CHIP_IS_OMAP44XX),
 };
 
 /*
@@ -846,7 +846,7 @@ static struct omap_hwmod omap44xx_smartreflex_core_hwmod = {
 	.slaves		= omap44xx_smartreflex_core_slaves,
 	.slaves_cnt	= ARRAY_SIZE(omap44xx_smartreflex_core_slaves),
 	.dev_attr	= &smartreflex_core_dev_attr,
-	.omap_chip	= OMAP_CHIP_INIT(CHIP_IS_OMAP4430),
+	.omap_chip	= OMAP_CHIP_INIT(CHIP_IS_OMAP44XX),
 };
 
 /* smartreflex_iva */
@@ -898,7 +898,7 @@ static struct omap_hwmod omap44xx_smartreflex_iva_hwmod = {
 	.slaves		= omap44xx_smartreflex_iva_slaves,
 	.slaves_cnt	= ARRAY_SIZE(omap44xx_smartreflex_iva_slaves),
 	.dev_attr	= &smartreflex_iva_dev_attr,
-	.omap_chip	= OMAP_CHIP_INIT(CHIP_IS_OMAP4430),
+	.omap_chip	= OMAP_CHIP_INIT(CHIP_IS_OMAP44XX),
 };
 
 /* smartreflex_mpu */
@@ -950,7 +950,7 @@ static struct omap_hwmod omap44xx_smartreflex_mpu_hwmod = {
 	.slaves		= omap44xx_smartreflex_mpu_slaves,
 	.slaves_cnt	= ARRAY_SIZE(omap44xx_smartreflex_mpu_slaves),
 	.dev_attr       = &smartreflex_mpu_dev_attr,
-	.omap_chip	= OMAP_CHIP_INIT(CHIP_IS_OMAP4430),
+	.omap_chip	= OMAP_CHIP_INIT(CHIP_IS_OMAP44XX),
 };
 
 /*
@@ -1213,6 +1213,7 @@ static struct omap_hwmod_opt_clk bandgap446x_opt_clks[] = {
 static struct omap_hwmod omap446x_bandgap_hwmod = {
 	.name		= "bandgap",
 	.class		= &omap44xx_bandgap_hwmod_class,
+	.clkdm_name	= "l4_wkup_clkdm",
 	.prcm		= {
 		.omap4 = {
 			.clkctrl_offs = OMAP4_CM_WKUP_BANDGAP_CLKCTRL_OFFSET,
@@ -2271,12 +2272,15 @@ static struct omap_hwmod omap443x_gpio1_hwmod = {
 static struct omap_hwmod omap446x_gpio1_hwmod = {
 	.name		= "gpio1",
 	.class		= &omap44xx_gpio_hwmod_class,
-	.flags          = HWMOD_INIT_NO_RESET,
+	.clkdm_name	= "l4_wkup_clkdm",
+//	.flags          = HWMOD_INIT_NO_RESET,
 	.mpu_irqs	= omap44xx_gpio1_irqs,
 	.main_clk	= "gpio1_ick",
 	.prcm = {
 		.omap4 = {
 			.clkctrl_offs = OMAP4_CM_WKUP_GPIO1_CLKCTRL_OFFSET,
+			.context_offs = OMAP4_RM_WKUP_GPIO1_CONTEXT_OFFSET,
+			.modulemode   = MODULEMODE_HWCTRL,
 		},
 	},
 	.opt_clks	= gpio1_opt_clks,
@@ -2728,7 +2732,6 @@ static struct omap_hwmod omap44xx_i2c1_hwmod = {
 	.slaves		= omap44xx_i2c1_slaves,
 	.slaves_cnt	= ARRAY_SIZE(omap44xx_i2c1_slaves),
 	.dev_attr	= &i2c_dev_attr,
-	.omap_chip	= OMAP_CHIP_INIT(CHIP_IS_OMAP4430),
 	.omap_chip	= OMAP_CHIP_INIT(CHIP_IS_OMAP44XX),
 };
 
@@ -5641,6 +5644,9 @@ static __initdata struct omap_hwmod *omap44xx_hwmods[] = {
 
 	/* temperature sensor hwmod */
 	&omap44xx_temperature_sensor_hwmod,
+
+	/* ctrl module class */
+	//&omap44xx_ctrl_module_core_hwmod,
 
 	/* uart class */
 	&omap44xx_uart1_hwmod,
