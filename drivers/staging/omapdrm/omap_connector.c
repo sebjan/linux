@@ -33,6 +33,9 @@ struct omap_connector {
 	struct drm_connector base;
 	struct omap_dss_device *dssdev;
 	struct drm_display_mode *native_mode;
+	bool auto_update_work_enabled;
+	struct delayed_work auto_update_work;
+	struct workqueue_struct *auto_update_wq;
 };
 
 static inline void copy_timings_omap_to_drm(struct drm_display_mode *mode,
@@ -104,10 +107,15 @@ enum drm_connector_status omap_connector_detect(
 	return ret;
 }
 
+void omap_connector_stop_auto_update(struct omap_connector *oconnect);
+
 static void omap_connector_destroy(struct drm_connector *connector)
 {
 	struct omap_connector *omap_connector = to_omap_connector(connector);
 	struct omap_dss_device *dssdev = omap_connector->dssdev;
+
+	if (omap_connector->auto_update_work_enabled)
+		omap_connector_stop_auto_update(omap_connector);
 
 	dssdev->driver->disable(dssdev);
 
@@ -387,6 +395,76 @@ void omap_connector_mode_set(struct drm_connector *connector,
 	dssdrv->set_timings(dssdev, &timings);
 }
 
+static void omap_connector_auto_update_work(struct work_struct *work)
+{
+	struct omap_dss_device *dssdev;
+	struct omap_dss_driver *dssdrv;
+	struct omap_connector *d;
+	u16 w, h;
+	unsigned int freq;
+
+	d = container_of(work, struct omap_connector,
+			auto_update_work.work);
+
+	dssdev = d->dssdev;
+	dssdrv = dssdev->driver;
+
+	if (!dssdrv || !dssdrv->update)
+		return;
+
+	if (dssdrv->sync)
+		dssdrv->sync(dssdev);
+
+	dssdrv->get_resolution(dssdev, &w, &h);
+	dssdrv->update(dssdev, 0, 0, w, h);
+
+	DBG("%s", dssdev->name);
+/*	freq = auto_update_freq;
+	if (freq == 0)*/
+		freq = 20;
+	queue_delayed_work(d->auto_update_wq,
+			&d->auto_update_work, HZ / freq);
+}
+
+void omap_connector_start_auto_update(struct omap_connector *oconnect,
+		struct omap_dss_device *display)
+{
+	DBG("%s", oconnect->dssdev->name);
+	if (oconnect->auto_update_wq == NULL) {
+		struct workqueue_struct *wq;
+
+		wq = create_singlethread_workqueue("omapfb_auto_update");
+
+		if (wq == NULL) {
+			dev_err(&oconnect->dssdev->dev, "Failed to create workqueue for "
+					"auto-update\n");
+			return;
+		}
+
+		oconnect->auto_update_wq = wq;
+	}
+
+	INIT_DELAYED_WORK(&oconnect->auto_update_work, omap_connector_auto_update_work);
+
+	oconnect->auto_update_work_enabled = true;
+
+	omap_connector_auto_update_work(&oconnect->auto_update_work.work);
+}
+
+void omap_connector_stop_auto_update(struct omap_connector *oconnect)
+{
+	DBG("");
+	cancel_delayed_work_sync(&oconnect->auto_update_work);
+
+	oconnect->auto_update_work_enabled = false;
+
+	if (oconnect->auto_update_wq != NULL) {
+		flush_workqueue(oconnect->auto_update_wq);
+		destroy_workqueue(oconnect->auto_update_wq);
+		oconnect->auto_update_wq = NULL;
+	}
+}
+
 enum omap_dss_update_mode omap_connector_get_update_mode(
 		struct drm_connector *connector)
 {
@@ -505,6 +583,11 @@ struct drm_connector * omap_connector_init(struct drm_device *dev,
 	default:
 		break;
 	}
+
+	if (dssdev->caps & OMAP_DSS_DISPLAY_CAP_MANUAL_UPDATE)
+		omap_connector_start_auto_update(omap_connector, dssdev);
+	else
+		DBG("non-manual update device: %s", dssdev->name);
 
 	return connector;
 
