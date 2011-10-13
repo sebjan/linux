@@ -1888,7 +1888,7 @@ int dispc_setup_plane(enum omap_plane plane,
 					"required fclk rate = %lu Hz, "
 					"current fclk rate = %lu Hz\n",
 					fclk, dispc_fclk_rate());
-			return -EINVAL;
+//			return -EINVAL;
 		}
 	}
 
