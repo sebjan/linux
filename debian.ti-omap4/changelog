@@ -1,3 +1,72 @@
+linux-ti-omap4 (3.0.0-1281.0) oneiric; urgency=low
+
+  [ Sebastien Jan ]
+
+  * Config: import Ubuntu kernel config
+  * Config: enable DRM, TAAL, MODVERSIONS, touchscreen
+
+  [ Upstream Kernel Changes ]
+
+  * OMAP: DSS2: remove extra includes from include/video/omapdss.h
+  * OMAP: DSS2: DSI: Change dummy macros to inline functions
+  * OMAP: DSS: Add a header file for picodlp data
+  * OMAP: DSS: Add a picodlp header file
+  * OMAP: DSS: Add picodlp panel driver
+  * OMAP: DSS2: OMAPFB: Add struct to store per-display data
+  * OMAP: DSS2: OMAPFB: Implement auto-update mode
+  * OMAP4: 4430SDP: Add Panel Taal device struct in 4430sdp board file
+  * OMAP: change get_context_loss_count ret value to int
+  * OMAP: DSS2: Taal: Make driver more fault tolerant
+  * OMAP: DSS2: Reset LANEx_ULPS_SIG2 bits after use
+  * OMAP: DSS2: Handle dpll4_m4_ck in dss_get/put_clocks
+  * OMAP: DSS2: Clean up probe for DSS & DSI
+  * OMAP: DSS2: Init dispc first before other components
+  * OMAP: DSS2: Remove clk optimization at dss init
+  * OMAP: DSS2: rewrite use of context_loss_count
+  * OMAP: DSS2: Use omap_pm_get_dev_context_loss_count to get ctx loss
+    count
+  * OMAP: DSS2: DPI: remove unneeded SYSCK enable/disable
+  * OMAP: DSS2: Add FEAT_VENC_REQUIRES_TV_DAC_CLK
+  * OMAP: DSS2: Add new FEAT definitions for features missing from OMAP2
+  * OMAP: DSS2: Remove core_dump_clocks
+  * OMAP: DSS2: Remove CONFIG_OMAP2_DSS_SLEEP_BEFORE_RESET
+  * OMAP4: HWMOD: Modify DSS opt clocks
+  * OMAP3: HWMOD: Add DSS opt clocks
+  * OMAP2420: HWMOD: Add DSS opt clocks
+  * OMAP2430: HWMOD: Add DSS opt clocks
+  * OMAP4: HWMOD: change DSS main_clk scheme
+  * OMAP: DSS2: Use PM runtime & HWMOD support
+  * OMAP4: HWMOD: Remove unneeded DSS opt clocks
+  * OMAP: DSS2: Remove unused opt_clock_available
+  * OMAP: DSS2: DISPC: remove finegrained clk enables/disables
+  * OMAP: DSS2: Remove unused code from display.c
+  * OMAP: DSS2: Remove ctx loss count from dss.c
+  * OMAP4: CLKDEV: Remove omapdss clock aliases
+  * OMAP: DSS2: DISPC: Fix context save/restore
+  * OMAP: DSS2: DSS: Fix context save/restore
+  * OMAP: Consolidate DSS regulator supplies
+  * OMAP: DSS2: Change DSI device naming
+  * OMAP: DSS: Move omap_display_init declaration to common-board-devices.h
+  * OMAP: DSS2: DSI: Improve dsi_mux_pads parameters
+  * OMAP: DSS2: Implement dsi_mux_pads for OMAP4
+  * OMAP4430SDP: Remove use of GPIO 27
+  * OMAP4430SDP: Board File changes for second LCD panel
+  * OMAP4: DSS: Adding a picodlp in OMAP4430 SDP board file
+  * OMAP3: fix build issue in board files
+  * OMAP4: SDP4430: remove picodlp device to complete boot
+  * drm/omap: don't use set_timings if it doesn't exist
+  * OMAP: DRM: auto-update mode
+  * OMAPDSS: DISPC: Create helper function dispc_mgr_is_lcd()
+  * OMAPDSS: DISPC: Get correct pixel clock for TV manager
+  * DISPC: hack to support HDMI with multiple displays
+  * syntm12xx: Port synaptics touch screen
+  * [Blaze] Add board-blaze-touch.c: Add touch screen board file
+  * [Blaze] Board 4430 sdp file and kconfig
+  * [Blaze] Synaptics: Update the TS driver from K35
+  * [Blaze] board-blaze-touch: Add linux friendly names
+
+ -- Sebastien JAN <s-jan@ti.com>  Fri, 14 Oct 2011 10:50:05 +0200
+
 linux-ti-omap4 (3.0.0-1280.8) oneiric; urgency=low
 
   [ Sebastien Jan ]
