@@ -374,6 +374,7 @@ static int __init omap4_twl6030_hsmmc_init(struct omap2_hsmmc_info *controllers)
 	return 0;
 }
 
+
 static struct regulator_init_data sdp4430_vaux1 = {
 	.constraints = {
 		.min_uV			= 1000000,
@@ -387,6 +388,25 @@ static struct regulator_init_data sdp4430_vaux1 = {
 	},
 	.num_consumer_supplies  = 1,
 	.consumer_supplies      = sdp4430_vaux_supply,
+};
+
+static struct regulator_consumer_supply sdp4430_vaux2_supply[] = {
+	REGULATOR_SUPPLY("av-switch", "soc-audio"),
+};
+
+static struct regulator_init_data sdp4430_vaux2 = {
+	.constraints = {
+		.min_uV			= 1200000,
+		.max_uV			= 2800000,
+		.apply_uV		= true,
+		.valid_modes_mask	= REGULATOR_MODE_NORMAL
+					| REGULATOR_MODE_STANDBY,
+		.valid_ops_mask	 = REGULATOR_CHANGE_VOLTAGE
+					| REGULATOR_CHANGE_MODE
+					| REGULATOR_CHANGE_STATUS,
+	},
+	.num_consumer_supplies	= 1,
+	.consumer_supplies	= sdp4430_vaux2_supply,
 };
 
 static struct regulator_init_data sdp4430_vusim = {
@@ -416,11 +436,29 @@ static struct regulator_init_data sdp4430_vcxio = {
 	.consumer_supplies	= sdp4430_vcxio_supply,
 };
 
+static void omap4_audio_conf(void)
+{
+	/* twl6040 naudint */
+	omap_mux_init_signal("sys_nirq2.sys_nirq2", \
+		OMAP_PIN_INPUT_PULLUP);
+}
+
+static struct twl4030_codec_data twl6040_codec;
+
+static struct twl4030_audio_data twl6040_audio = {
+	.codec		= &twl6040_codec,
+	.audpwron_gpio	= 127,
+	.naudint_irq	= OMAP44XX_IRQ_SYS_2N,
+	.irq_base	= TWL6040_CODEC_IRQ_BASE,
+};
+
 static struct twl4030_platform_data sdp4430_twldata = {
 	/* Regulators */
 	.vusim		= &sdp4430_vusim,
 	.vcxio		= &sdp4430_vcxio,
 	.vaux1		= &sdp4430_vaux1,
+	.vaux2		= &sdp4430_vaux2,
+	.audio		= &twl6040_audio,
 };
 
 static struct i2c_board_info __initdata sdp4430_i2c_3_boardinfo[] = {
@@ -848,6 +886,7 @@ static void __init omap_4430sdp_init(void)
 	omap_board_config = sdp4430_config;
 	omap_board_config_size = ARRAY_SIZE(sdp4430_config);
 
+	omap4_audio_conf();
 	omap4_i2c_init();
 	omap_sfh7741prox_init();
 	blaze_touch_init();
