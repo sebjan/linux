@@ -36,6 +36,7 @@
 #include <plat/usb.h>
 #include <plat/mmc.h>
 #include <plat/omap4-keypad.h>
+#include <plat/dma-44xx.h>
 #include <video/omapdss.h>
 #include <video/omap-panel-nokia-dsi.h>
 #include <video/omap-panel-picodlp.h>
@@ -210,6 +211,26 @@ static struct led_pwm_platform_data sdp4430_pwm_data = {
 	.leds		= sdp4430_pwm_leds,
 };
 
+static struct resource omap4_hdmi_resources[] = {
+        [0] = {
+                .start = OMAP44XX_DSS_HDMI_L3_BASE,
+                .end   = OMAP44XX_DSS_HDMI_L3_BASE + SZ_4M - 1,
+                .flags = IORESOURCE_MEM,
+        },
+        [1] = {
+                .start = OMAP44XX_DMA_DSS_HDMI_REQ,
+                .end   = OMAP44XX_DMA_DSS_HDMI_REQ,
+                .flags = IORESOURCE_DMA,
+        },
+};
+
+static struct platform_device omap4_hdmi_audio_device = {
+	.name	= "hdmi-audio-dai",
+	.id	= -1,
+	.num_resources = ARRAY_SIZE(omap4_hdmi_resources),
+	.resource = omap4_hdmi_resources,
+};
+
 static struct platform_device sdp4430_leds_pwm = {
 	.name	= "leds_pwm",
 	.id	= -1,
@@ -284,6 +305,7 @@ static struct platform_device *sdp4430_devices[] __initdata = {
 	&sdp4430_gpio_keys_device,
 	&sdp4430_leds_gpio,
 	&sdp4430_leds_pwm,
+	&omap4_hdmi_audio_device,
 };
 
 static struct omap_board_config_kernel sdp4430_config[] __initdata = {
