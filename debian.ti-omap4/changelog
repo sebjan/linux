@@ -1,3 +1,20 @@
+linux-ti-omap4 (3.0.0-1281.1) oneiric; urgency=low
+
+  [ Sebastien Jan ]
+
+  * Config: configure BT as module and enable USB suspend
+  * Ubuntu-3.0.0-1281.1
+
+  [ Upstream Kernel Changes ]
+
+  * SDP4430: add audio support
+  * OMAP4460: HDMI: Disable HDMI DDC internal pull up resistor
+  * SDP4430: Add HDMI audio device
+  * [Blaze] add mmc5/wl1283 device support
+  * WL12XX: fix nvs filename for 1283 device
+
+ -- Sebastien JAN <s-jan@ti.com>  Mon, 17 Oct 2011 14:50:37 +0200
+
 linux-ti-omap4 (3.0.0-1281.0) oneiric; urgency=low
 
   [ Sebastien Jan ]

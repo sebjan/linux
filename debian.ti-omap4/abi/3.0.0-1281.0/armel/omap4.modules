@@ -107,6 +107,7 @@ bfusb
 binfmt_aout
 block2mtd
 blowfish
+bluetooth
 bonding
 bpa10x
 bpqether
@@ -119,6 +120,7 @@ bsd_comp
 btrfs
 btsdio
 btusb
+btwilink
 bw-qcam
 c-qcam
 c67x00
@@ -143,6 +145,7 @@ ceph
 cfbcopyarea
 cfbfillrect
 cfbimgblt
+cfg80211
 cfi_cmdset_0001
 cfi_cmdset_0002
 cfi_cmdset_0020
@@ -331,6 +334,7 @@ f71882fg
 f75375s
 faulty
 fcrypt
+fm_drv
 freevxfs
 fscache
 ftdi-elan
@@ -634,6 +638,7 @@ lxt
 m25p80
 mISDN_core
 ma600-sir
+mac80211
 mac80211_hwsim
 macvlan
 magellan
@@ -966,6 +971,7 @@ redboot
 reed_solomon
 reiserfs
 rfd_ftl
+rfkill
 rio500
 rj54n1cb0c
 rmd128
@@ -1184,6 +1190,7 @@ squashfs
 sr_mod
 ssb
 ssfdc
+st_drv
 stb0899
 stb6000
 stb6100
