@@ -1,3 +1,7 @@
+linux-ti-omap4 (3.1.0-1282.0) oneiric; urgency=low
+
+ -- Xavier Boudet <x-boudet@ti.com>  Wed, 26 Oct 2011 21:01:33 +0100
+
 linux-ti-omap4 (3.0.0-1281.0) oneiric; urgency=low
 
  -- Sebastien JAN <s-jan@ti.com>  Wed, 23 Mar 2011 18:01:33 +0100
