@@ -475,6 +475,7 @@ static void __init omap4_abb_trim_update(
 int __init omap4_opp_init(void)
 {
 	int r = -ENODEV;
+	int trimmed = 1;
 
 	if (!cpu_is_omap44xx())
 		return r;
@@ -485,7 +486,15 @@ int __init omap4_opp_init(void)
 		omap4_abb_trim_update(omap446x_ldo_abb_trim_data);
 		r = omap_init_opp_table(omap446x_opp_def_list,
 			ARRAY_SIZE(omap446x_opp_def_list));
+		trimmed = omap_ctrl_readl(OMAP4_CTRL_MODULE_CORE_STD_FUSE_OPP_DPLL_1)
+							& ((1 << 18) | (1 << 19));;
+		/* if device is untrimmed override DPLL TRIM register */
+		if (!trimmed) {
+			omap_ctrl_writel(0x29, OMAP4_CTRL_MODULE_CORE_DPLL_NWELL_TRIM_0);
+			pr_info("MPU DPLL non-trimmed device => trimming override\n");
+		}
 	}
+
 	if (!r) {
 		if (omap4_has_mpu_1_2ghz())
 			omap4_mpu_opp_enable(1200000000);
