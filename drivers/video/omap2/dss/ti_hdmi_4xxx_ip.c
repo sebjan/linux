@@ -428,8 +428,6 @@ bool ti_hdmi_4xxx_detect(struct hdmi_ip_data *ip_data)
 	/* HPD */
 	r = REG_GET(base, HDMI_CORE_SYS_SYS_STAT, 1, 1);
 
-pr_err("ti_hdmi_4xxx_detect says %d\n", r == 1); 
-
 	return r == 1;
 }
 
