@@ -424,7 +424,7 @@ int mdp_probe(struct platform_device *pdev)
 		return PTR_ERR(clk);
 	}
 
-	ret = request_irq(mdp->irq, mdp_isr, IRQF_DISABLED, "msm_mdp", mdp);
+	ret = request_irq(mdp->irq, mdp_isr, 0, "msm_mdp", mdp);
 	if (ret)
 		goto error_request_irq;
 	disable_irq(mdp->irq);
