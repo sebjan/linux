@@ -69,6 +69,10 @@ static int __init omap_barriers_init(void)
 		pr_info("Enabling ERRATA 742230\n");
 	}
 
+	/* ERRATA 751472 for Cortex-A9 in OMAP44xx */
+	omap_smc1(0x114, 1 << 11);
+	pr_info("Enabling ERRATA 751472\n");
+
 	size = ALIGN(PAGE_SIZE, SZ_1M);
 	paddr = memblock_alloc(size, SZ_1M);
 	if (!paddr) {
