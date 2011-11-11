@@ -34,8 +34,6 @@
 #include <linux/delay.h>
 #include <linux/slab.h>
 #include <video/omapdss.h>
-#include <linux/i2c.h>
-#include "../../edid.h"
 
 #include <video/omap-panel-generic-dpi.h>
 
@@ -243,9 +241,6 @@ struct panel_drv_data {
 	struct panel_config *panel_config;
 };
 
-static bool generic_dpi_panel_is_detected(struct omap_dss_device *dssdev,
-				bool force);
-
 static inline struct panel_generic_dpi_data
 *get_panel_data(const struct omap_dss_device *dssdev)
 {
@@ -308,7 +303,6 @@ static int generic_dpi_panel_probe(struct omap_dss_device *dssdev)
 	struct panel_config *panel_config = NULL;
 	struct panel_drv_data *drv_data = NULL;
 	int i;
-	const char *default_disp_name;
 
 	dev_dbg(&dssdev->dev, "probe\n");
 
@@ -339,16 +333,6 @@ static int generic_dpi_panel_probe(struct omap_dss_device *dssdev)
 
 	dev_set_drvdata(&dssdev->dev, drv_data);
 
-	default_disp_name = omap_dss_get_def_disp();
-
-	if (!panel_data->i2c_bus_num && dssdev->name && default_disp_name &&
-				strcmp(dssdev->name, default_disp_name) == 0) {
-		dev_dbg(&dssdev->dev, "manually enabling %s",
-			dssdev->name);
-		dssdev->state = OMAP_DSS_DISPLAY_SUSPENDED;
-		dssdev->activate_after_resume = true;
-	}
-
 	return 0;
 }
 
@@ -366,13 +350,6 @@ static void __exit generic_dpi_panel_remove(struct omap_dss_device *dssdev)
 static int generic_dpi_panel_enable(struct omap_dss_device *dssdev)
 {
 	int r = 0;
-
-	/* Avoid enabling the panel if there is none around */
-	if (!generic_dpi_panel_is_detected(dssdev, false)) {
-		printk(KERN_ERR "Not enabling generic panel as no "
-				"connector is detected\n");
-		return 1;
-	}
 
 	r = generic_dpi_panel_power_on(dssdev);
 	if (r)
@@ -430,101 +407,6 @@ static int generic_dpi_panel_check_timings(struct omap_dss_device *dssdev,
 	return dpi_check_timings(dssdev, timings);
 }
 
-/* i2c / edid support */
-
-#define DDC_ADDR 0x50
-
-static int do_probe_ddc_edid(struct i2c_adapter *adapter,
-		unsigned char *buf, int block, int len)
-{
-	unsigned char start = block * EDID_LENGTH;
-	int i;
-	struct i2c_msg msgs[] = {
-		{
-			.addr   = DDC_ADDR,
-			.flags  = 0,
-			.len    = 1,
-			.buf    = &start,
-		}, {
-			.addr   = DDC_ADDR,
-			.flags  = I2C_M_RD,
-			.len    = len,
-			.buf    = buf,
-		}
-	};
-
-	/* try at least 3 times, avoid miss for time-out */
-	for (i = 0; i < 3; i++) {
-		if (i2c_transfer(adapter, msgs, 2) == 2)
-			return 0;
-	}
-
-	return -1;
-}
-
-static int generic_dpi_panel_get_edid(struct omap_dss_device *dssdev,
-		u8 *buf, int len)
-{
-	struct panel_generic_dpi_data *panel_data = get_panel_data(dssdev);
-	struct i2c_adapter *adapter;
-	int i;
-	u8 *edid, *new;
-
-	adapter = i2c_get_adapter(panel_data->i2c_bus_num);
-	if (!adapter) {
-		printk(KERN_ERR "Invalid I2C adapter, bus number: %d\n",
-				panel_data->i2c_bus_num);
-		return -EINVAL;
-	}
-
-	if ((edid = kmalloc(EDID_LENGTH, GFP_KERNEL)) == NULL)
-		return -EINVAL;
-
-	if (do_probe_ddc_edid(adapter, edid, 0, EDID_LENGTH))
-		goto out;
-
-	/* if there are extensions, probe more */
-	if (edid[0x7e] != 0) {
-		new = krealloc(edid, (edid[0x7e] + 1) * EDID_LENGTH,
-					GFP_KERNEL);
-		if (!new)
-			goto out;
-		edid = new;
-
-		for (i = 1; i <= edid[0x7e]; i++) {
-			if (do_probe_ddc_edid(adapter,
-					edid + i * EDID_LENGTH,
-					i, EDID_LENGTH))
-				goto out;
-		}
-	}
-
-	if (edid) {
-		memcpy(buf, edid, len);
-		kfree(edid);
-		return 0;
-	}
-
-out:
-	kfree(edid);
-	return -EINVAL;
-}
-
-static bool generic_dpi_panel_is_detected(struct omap_dss_device *dssdev,
-				bool force)
-{
-	struct panel_generic_dpi_data *panel_data = get_panel_data(dssdev);
-	struct i2c_adapter *adapter;
-	unsigned char out;
-
-	adapter = i2c_get_adapter(panel_data->i2c_bus_num);
-	if (!adapter) {
-		return omapdss_default_is_detected(dssdev, force);
-	}
-
-	return (do_probe_ddc_edid(adapter, &out, 0, 1) == 0);
-}
-
 static struct omap_dss_driver dpi_driver = {
 	.probe		= generic_dpi_panel_probe,
 	.remove		= __exit_p(generic_dpi_panel_remove),
@@ -537,9 +419,6 @@ static struct omap_dss_driver dpi_driver = {
 	.set_timings	= generic_dpi_panel_set_timings,
 	.get_timings	= generic_dpi_panel_get_timings,
 	.check_timings	= generic_dpi_panel_check_timings,
-
-	.get_edid	= generic_dpi_panel_get_edid,
-	.is_detected	= generic_dpi_panel_is_detected,
 
 	.driver         = {
 		.name   = "generic_dpi_panel",

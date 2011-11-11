@@ -74,8 +74,6 @@ static int hdmi_panel_enable(struct omap_dss_device *dssdev)
 	r = omapdss_hdmi_display_enable(dssdev);
 	if (r) {
 		DSSERR("failed to power on\n");
-		/* swallow the error */
-		r = 0;
 		goto err;
 	}
 
@@ -145,16 +143,6 @@ err:
 	return r;
 }
 
-static bool hdmi_panel_is_detected(struct omap_dss_device *dssdev, bool force)
-{
-	return omapdss_hdmi_is_detected(dssdev, force);
-}
-
-static int hdmi_get_edid(struct omap_dss_device *dssdev, u8 *buf, int len)
-{
-	return omapdss_hdmi_get_edid(dssdev, buf, len);
-}
-
 static void hdmi_get_timings(struct omap_dss_device *dssdev,
 			struct omap_video_timings *timings)
 {
@@ -193,9 +181,12 @@ static int hdmi_check_timings(struct omap_dss_device *dssdev,
 	mutex_lock(&hdmi.hdmi_lock);
 
 	r = omapdss_hdmi_display_check_timing(dssdev, timings);
-
+	if (r) {
+		DSSERR("Timing cannot be applied\n");
+		goto err;
+	}
+err:
 	mutex_unlock(&hdmi.hdmi_lock);
-
 	return r;
 }
 
@@ -206,8 +197,6 @@ static struct omap_dss_driver hdmi_driver = {
 	.disable	= hdmi_panel_disable,
 	.suspend	= hdmi_panel_suspend,
 	.resume		= hdmi_panel_resume,
-	.is_detected	= hdmi_panel_is_detected,
-	.get_edid	= hdmi_get_edid,
 	.get_timings	= hdmi_get_timings,
 	.set_timings	= hdmi_set_timings,
 	.check_timings	= hdmi_check_timings,

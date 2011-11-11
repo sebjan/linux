@@ -2513,7 +2513,7 @@ static void dispc_set_lcd_divisor(enum omap_channel channel, u16 lck_div,
 		u16 pck_div)
 {
 	BUG_ON(lck_div < 1);
-	BUG_ON(pck_div < 1);
+	BUG_ON(pck_div < 2);
 
 	dispc_write_reg(DISPC_DIVISORo(channel),
 			FLD_VAL(lck_div, 23, 16) | FLD_VAL(pck_div, 7, 0));
@@ -2995,16 +2995,10 @@ void dispc_set_pol_freq(enum omap_channel channel,
 void dispc_find_clk_divs(bool is_tft, unsigned long req_pck, unsigned long fck,
 		struct dispc_clock_info *cinfo)
 {
-	u16 pcd_min, pcd_max;
+	u16 pcd_min = is_tft ? 2 : 3;
 	unsigned long best_pck;
 	u16 best_ld, cur_ld;
 	u16 best_pd, cur_pd;
-
-	pcd_min = dss_feat_get_param_min(FEAT_PARAM_DSS_PCD);
-	pcd_max = dss_feat_get_param_max(FEAT_PARAM_DSS_PCD);
-
-	if (!is_tft)
-		pcd_min = 3;
 
 	best_pck = 0;
 	best_ld = 0;
@@ -3013,7 +3007,7 @@ void dispc_find_clk_divs(bool is_tft, unsigned long req_pck, unsigned long fck,
 	for (cur_ld = 1; cur_ld <= 255; ++cur_ld) {
 		unsigned long lck = fck / cur_ld;
 
-		for (cur_pd = pcd_min; cur_pd <= pcd_max; ++cur_pd) {
+		for (cur_pd = pcd_min; cur_pd <= 255; ++cur_pd) {
 			unsigned long pck = lck / cur_pd;
 			long old_delta = abs(best_pck - req_pck);
 			long new_delta = abs(pck - req_pck);
@@ -3048,7 +3042,7 @@ int dispc_calc_clock_rates(unsigned long dispc_fclk_rate,
 {
 	if (cinfo->lck_div > 255 || cinfo->lck_div == 0)
 		return -EINVAL;
-	if (cinfo->pck_div < 1 || cinfo->pck_div > 255)
+	if (cinfo->pck_div < 2 || cinfo->pck_div > 255)
 		return -EINVAL;
 
 	cinfo->lck = dispc_fclk_rate / cinfo->lck_div;
@@ -3312,8 +3306,23 @@ static void dispc_error_worker(struct work_struct *work)
 	dispc.error_irqs = 0;
 	spin_unlock_irqrestore(&dispc.irq_lock, flags);
 
-	if (errors & DISPC_IRQ_GFX_FIFO_UNDERFLOW)
-		DSSERR("GFX_FIFO_UNDERFLOW\n");
+	if (errors & DISPC_IRQ_GFX_FIFO_UNDERFLOW) {
+		DSSERR("GFX_FIFO_UNDERFLOW, disabling GFX\n");
+		for (i = 0; i < omap_dss_get_num_overlays(); ++i) {
+			struct omap_overlay *ovl;
+			ovl = omap_dss_get_overlay(i);
+
+			if (!(ovl->caps & OMAP_DSS_OVL_CAP_DISPC))
+				continue;
+
+			if (ovl->id == 0) {
+				dispc_enable_plane(ovl->id, 0);
+				dispc_go(ovl->manager->id);
+				mdelay(50);
+				break;
+			}
+		}
+	}
 
 	if (errors & DISPC_IRQ_VID1_FIFO_UNDERFLOW) {
 		DSSERR("VID1_FIFO_UNDERFLOW, disabling VID1\n");
@@ -3390,8 +3399,44 @@ static void dispc_error_worker(struct work_struct *work)
 		}
 	}
 
-	if (errors & DISPC_IRQ_SYNC_LOST_DIGIT)
-		DSSERR("SYNC_LOST_DIGIT\n");
+	if (errors & DISPC_IRQ_SYNC_LOST_DIGIT) {
+		struct omap_overlay_manager *manager = NULL;
+		bool enable = false;
+
+		DSSERR("SYNC_LOST_DIGIT, disabling TV\n");
+
+		for (i = 0; i < omap_dss_get_num_overlay_managers(); ++i) {
+			struct omap_overlay_manager *mgr;
+			mgr = omap_dss_get_overlay_manager(i);
+
+			if (mgr->id == OMAP_DSS_CHANNEL_DIGIT) {
+				manager = mgr;
+				enable = mgr->device->state ==
+						OMAP_DSS_DISPLAY_ACTIVE;
+				mgr->device->driver->disable(mgr->device);
+				break;
+			}
+		}
+
+		if (manager) {
+			struct omap_dss_device *dssdev = manager->device;
+			for (i = 0; i < omap_dss_get_num_overlays(); ++i) {
+				struct omap_overlay *ovl;
+				ovl = omap_dss_get_overlay(i);
+
+				if (!(ovl->caps & OMAP_DSS_OVL_CAP_DISPC))
+					continue;
+
+				if (ovl->id != 0 && ovl->manager == manager)
+					dispc_enable_plane(ovl->id, 0);
+			}
+
+			dispc_go(manager->id);
+			mdelay(50);
+			if (enable)
+				dssdev->driver->enable(dssdev);
+		}
+	}
 
 	if (errors & DISPC_IRQ_SYNC_LOST2) {
 		struct omap_overlay_manager *manager = NULL;
