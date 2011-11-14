@@ -1,3 +1,156 @@
+linux-ti-omap4 (3.1.0-1282.2) oneiric; urgency=low
+
+  [ Sebastien Jan ]
+
+  * Config: enable cpufreq governors
+  * Config: enable ARM errata 754322
+  * Config: uplevel with recent changes
+
+  [ Upstream Kernel Changes ]
+
+  * Revert "HACK: OMAP: DSS2: clk hack for OMAP2/3"
+  * Revert "OMAP: DSS2: HDMI: fix hdmi clock name"
+  * OMAP: hwmod: Fix the addr space, irq, dma count APIs
+  * OMAP4: ERRATA 742230 for OMAP4430
+  * omap4430: fix core domain frequency
+  * omap4430: disable OPP50 support for core and iva
+  * omap4460: Fix core domain frequency
+  * omap4460: disable OPP50 for iva and core
+  * OMAP4: ERRATA 751472 for OMAP44XX
+  * OMAP: Revert DSS DRM patches
+  * OMAP: DSS2: Add picodlp panel driver
+  * OMAP: DSS2: PicoDLP: fix error handling in power_on
+  * OMAP: DSS2: check for manager when enabling display
+  * OMAP: DSS2: Don't allow moving managers away from enabled displays
+  * OMAP: DSS: dispc: enable/disable clocks in error handler
+  * OMAPFB: make debug message more useful
+  * OMAP: DSS2: DISPC: Prepare dispc_dump_regs() for shortening
+  * OMAP: DSS2: DISPC: Shorten dispc_dump_regs()
+  * OMAP: DSS2: DISPC: dispc_save_context() and dispc_restore_context()
+    cleanup
+  * OMAP: DSS2: DISPC: Shorten _dispc_set_color_conv_coef()
+  * OMAP: DSS2: Use a macro to declare size of the fifo_size array in
+    dispc.c
+  * OMAP: DSS2: remove unneeded fck enable/disables
+  * OMAP: DSS2: Change DSI device naming
+  * OMAP: DSS2: DSI: Improve dsi_mux_pads parameters
+  * OMAP: OMAPFB: make omapfb start even when a display is missing a driver
+  * OMAP: DSS2: fix clock sources on error and uninit
+  * OMAP: DSS2: Handle manager change in apply
+  * OMAP: DSS2: Remove "EXPERIMENTAL" from Kconfig
+  * OMAP: DSS2: Remove support for non-DISPC overlays
+  * OMAP: DSS2: DISPC: use lookup tables for bit shifts
+  * OMAP: DSS2: Add overlay caps to DSS features
+  * OMAP: DSS2: Add GLOBAL_ALPHA & PRE_MULT_ALPHA to ovl caps
+  * OMAP: DSS2: string parsing cleanups
+  * OMAP: OMAPFB: string parsing cleanups
+  * OMAP: DSS2: DISPC: remove non-existing func prototypes
+  * OMAP: DSS2: DISPC: rename overlay related funcs
+  * OMAP: DSS2: DISPC: rename manager related funcs
+  * OMAP: DSS2: reorganize functions in dss.h
+  * OMAP: DSS2: Support for Innolux AT070TN83
+  * OMAP: DSS2: Use MIPI DSI enums from include/video/mipi_display.h
+  * OMAP: DSS2: DSI: Represent L4 and VP as sources of VC instead of modes
+  * OMAP: DSS2: Create enum for DSI operation modes
+  * OMAP: DSS2: DSI: Introduce generic write functions
+  * OMAP: DSS2: DSI: Remove functions dsi_vc_dcs_read_1() and
+    dsi_vc_dcs_read_2()
+  * OMAP: DSS2: DSI: Split dsi_vc_dcs_read() into 2 functions
+  * OMAP: DSS2: DSI: Introduce generic read functions
+  * OMAP: DSS2: Clean up stallmode and io pad mode selection
+  * OMAP: DSS2: Create an enum for DSI pixel formats
+  * OMAP: DSS2: DSI: Send zero length packet in dsi_vc_send_null()
+  * OMAP: DSS2: DSI Video mode support
+  * OMAP4: DSS2: HDMI: HDMI clean up to pass base_address
+  * OMAP4: DSS2: HDMI: Move pll and video configuration
+  * OMAP4: DSS2: HDMI: Use specific HDMI timings structure
+  * OMAP4: DSS2: HDMI: Move HDMI IP independent generic header
+  * OMAP4: DSS2: HDMI: Move the EDID definition from HDMI
+  * OMAP4: DSS2: HDMI: Split the current HDMI driver to move
+  * OMAP4: DSS2: HDMI: Move the HDMI IP dependent audio
+  * OMAP4: DSS2: HDMI: Rename the functions in HDMI IP library
+  * OMAP4: DSS2: HDMI: Function pointer approach to call
+  * OMAP4: DSS2: Rename hdmi_omap4_panel.c to hdmi_panel.c
+  * OMAP: DSS2: DISPC: Fix minimum PCD value
+  * OMAP: DSS2: HDMI: use default dividers
+  * OMAP: DSS2: HDMI: change regn definition
+  * OMAP: DSS2: DSI: Add comment about regn
+  * OMAP: DSS2: DISPC: Add missing IRQ	definitions
+  * OMAP: DSS2: add dss_get_hdmi_venc_clk_source()
+  * OMAP: DSS2: DISPC: improve dispc_mgr_enable_digit_out()
+  * OMAP: DSS2: HDMI: improve hdmi output enable
+  * OMAP: DSS2: add read_edid() to omap_dss_driver struct
+  * OMAP: DSS2: add detect() to omap_dss_driver struct
+  * OMAP: DSS2: HDMI: make set_timing saner
+  * OMAP: DSS2: HDMI: implement read_edid()
+  * OMAP: DSS2: HDMI: remove edid parsing
+  * OMAP: DSS2: HDMI: split hdmi_core_ddc_edid
+  * OMAP: DSS2: HDMI: clean up edid reading & fix checksum
+  * OMAP: DSS2: HDMI: remove error prints in check_timings
+  * OMAP: DSS2: HDMI: implement detect()
+  * OMAP: DSS2: add panel-dvi driver
+  * OMAP: DSS2: panel-generic-dpi: remove "generic" panel
+  * OMAPFB: find best mode from edid
+  * OMAPDSS: DISPC: Reduce the number of arguments in dispc_ovl_setup()
+  * OMAPDSS: DISPC: Pass overlay params as arguments to dispc_ovl_setup()
+  * OMAPDSS: DISPC: Create helper function dispc_mgr_is_lcd()
+  * OMAPDSS: DISPC: Get correct pixel clock for TV manager
+  * OMAPDSS: DISPC: Remove hardcoded use of PPL in five tap clock
+    calculation
+  * OMAPDSS: DISPC: Clean up scaling related clock and five tap
+    calculations
+  * OMAPDSS: FEATURES: Create a range param to get max downscaling
+  * OMAPDSS: Taal: remove external backlight support
+  * OMAPDSS: Port 2430sdp display driver to DSS2
+  * OMAPDSS: Port the H4 display driver to DSS2
+  * OMAPDSS: Port the Apollon display driver to DSS2
+  * OMAPDSS: Add N800 panel driver
+  * OMAPDSS: HDMI: Move the comments in avi infoframe
+  * OMAPDSS: HDMI: Replace hdmi_reg struct with u16
+  * OMAPDSS: HDMI: Add missing register definitions
+  * OMAPDSS: HDMI: Add support to dump registers through debugfs
+  * OMAPDSS: remove vaddr from overlay info
+  * video/omap: fix build dependencies
+  * OMAPDSS/OMAP_VOUT: Fix incorrect OMAP3-alpha compatibility setting
+  * OMAPDSS: DISPC: VIDEO3 pipeline support
+  * OMAPDSS: DISPC: zorder support for DSS overlays
+  * video: irq: Remove IRQF_DISABLED
+  * OMAPDSS: picodlp: add missing #include <linux/module.h>
+  * omap dss2 dont die on null driver for display
+  * After resume the HDMI/DVI output was still blank. It turns out that
+  * config omap2plus dss enable sdi dss omap4
+  * omap dss unable to bring up hdmi nonfatal
+  * V4L2: OMAP: Make it work for OMAP4
+  * OMAP DSS: allow discovery of default display
+  * OMAP: DSS: ensure default panel is enabled
+  * omap dss use correct codec name
+  * Add omap drm display driver
+  * drm/omap: make module unloading work
+  * drm/omap: add common scaled modes
+  * OMAP: DSS2: HDMI: use default dividers
+  * OMAP: DSS2: HDMI: change regn definition
+  * get_edid read_edid
+  * omap dss drm remove vaddr support
+  * omap dss drm partial_alpha_enabled
+  * omap dss make gfx fifo underflow nonfatal
+  * omap dss drm explain which connector did not initialize
+  * fix get_edid to read_edid
+  * fixes
+  * omapdrm remove get set update mode api
+  * add dssdev args
+  * dss correct return value for drm api
+  * dss hdmi msleep on detect
+  * remove enable display
+  * OMAP: DSS2: Add is_detected() driver API
+  * compile fixes generic dpi
+  * quench hdmi detect debug
+  * tps62361 default to nominal voltage
+  * [Blaze] Call smartreflex enable in the blaze board file
+  * arch/arm/mach-omap2/smartreflex.c: add missing error-handling code
+  * ARM: Panda: Add smartreflex call in panda board config
+
+ -- Sebastien JAN <s-jan@ti.com>  Mon, 14 Nov 2011 10:06:56 +0100
+
 linux-ti-omap4 (3.1.0-1282.1) oneiric; urgency=low
 
  -- Xavier Boudet <x-boudet@ti.com>  Thu, 27 Oct 2011 13:29:33 +0100
