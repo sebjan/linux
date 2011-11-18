@@ -14,6 +14,7 @@
 #include <linux/clk.h>
 #include <linux/io.h>
 #include <linux/bitops.h>
+#include <linux/delay.h>
 
 #include <plat/cpu.h>
 #include <plat/clock.h>
@@ -91,6 +92,37 @@ const struct clkops clkops_omap4_dpllmx_ops = {
 	.deny_idle	= omap4_dpllmx_deny_gatectrl,
 };
 
+static int omap4460_dcc(struct clk *clk, unsigned long rate)
+{
+        struct dpll_data *dd;                                                   
+        u32 v;                                                                  
+                                                                                
+        if (!clk || !rate || !clk->parent)                                      
+                return -EINVAL;                                                 
+                                                                                
+        dd = clk->parent->dpll_data;                                            
+                                                                                
+        if (!dd)                                                                
+                return -EINVAL; 
+
+        v = __raw_readl(dd->mult_div1_reg);                                     
+        if (rate < OMAP_1GHz) {                                                 
+                /* If DCC is enabled, disable it */                             
+                if (v & OMAP4460_DCC_EN_MASK) {                                 
+                        v &= ~OMAP4460_DCC_EN_MASK;                             
+                        __raw_writel(v, dd->mult_div1_reg);                     
+                }                                                               
+        } else {                                                                
+                v &= ~OMAP4460_DCC_COUNT_MAX_MASK;                              
+                v |= (5 << OMAP4460_DCC_COUNT_MAX_SHIFT);                       
+                v |= OMAP4460_DCC_EN_MASK;                                      
+                __raw_writel(v, dd->mult_div1_reg);                             
+  	} 
+
+	return 0;
+}
+
+
 int omap4460_mpu_dpll_set_rate(struct clk *clk, unsigned long rate)
 {
 	struct dpll_data *dd;
@@ -115,23 +147,21 @@ int omap4460_mpu_dpll_set_rate(struct clk *clk, unsigned long rate)
 	 * And needs to be kept disabled for < 1 Ghz.
 	 */
 	dpll_rate = omap2_get_dpll_rate(clk->parent);
+
 	v = __raw_readl(dd->mult_div1_reg);
+	if (v & OMAP4460_DCC_EN_MASK)
+		dpll_rate *= 2;
+
+        pr_err("omap4460_mpu_dpll_set_rate: old rate %ld, new rate %ld\n",      
+                                                              dpll_rate, rate); 
+
 	if (rate < OMAP_1GHz) {
-		if (rate == dpll_rate)
-			return 0;
-		/* If DCC is enabled, disable it */
-		if (v & OMAP4460_DCC_EN_MASK) {
-			v &= ~OMAP4460_DCC_EN_MASK;
-			__raw_writel(v, dd->mult_div1_reg);
+		omap4460_dcc(clk, rate);
+		if (clk->parent->set_rate(clk->parent, rate)) {
+			omap4460_dcc(clk, dpll_rate);
+			return -EINVAL;
 		}
-		clk->parent->set_rate(clk->parent, rate);
 	} else {
-		if (rate == dpll_rate/2)
-			return 0;
-		v &= ~OMAP4460_DCC_COUNT_MAX_MASK;
-		v |= (5 << OMAP4460_DCC_COUNT_MAX_SHIFT);
-		v |= OMAP4460_DCC_EN_MASK;
-		__raw_writel(v, dd->mult_div1_reg);
 		/*
 		 * On 4460, the MPU clk for frequencies higher than 1Ghz
 		 * is sourced from CLKOUTX2_M3, instead of CLKOUT_M2, while
@@ -139,7 +169,11 @@ int omap4460_mpu_dpll_set_rate(struct clk *clk, unsigned long rate)
 		 * than 1 Ghz, lock the DPLL at half the rate so the
 		 * CLKOUTX2_M3 then matches the requested rate.
 		 */
-		clk->parent->set_rate(clk->parent, rate/2);
+		if (clk->parent->set_rate(clk->parent, rate/2)) {
+			omap4460_dcc(clk, dpll_rate);
+			return -EINVAL;
+		}
+		 omap4460_dcc(clk, rate);
 	}
 
 	clk->rate = rate;
