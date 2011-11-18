@@ -758,6 +758,10 @@ static void __init omap4_panda_init(void)
 	register_netdevice_notifier(&omap_panda_netdev_notifier);
 
 	omap4_panda_i2c_init();
+
+        pr_err("Calling omap_enable_smartreflex_on_init from board file\n");    
+        omap_enable_smartreflex_on_init();
+
 	platform_add_devices(panda_devices, ARRAY_SIZE(panda_devices));
 	panda_leds_init();
 	platform_device_register(&omap_vwlan_device);
