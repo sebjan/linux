@@ -17,6 +17,8 @@
 #include <linux/kernel.h>
 #include <linux/errno.h>
 #include <linux/clk.h>
+#include <linux/list.h>
+#include <linux/slab.h>
 #include <linux/io.h>
 
 #include <asm/div64.h>
@@ -276,11 +278,27 @@ long omap2_dpll_round_rate(struct clk *clk, unsigned long target_rate)
 	unsigned long scaled_rt_rp;
 	unsigned long new_rate = 0;
 	struct dpll_data *dd;
+	unsigned long bestrate = 0, diff, bestdiff = ULONG_MAX;
+	int bestm = 0, bestn = 0;
+	struct list_head *lp;
+	struct dpll_rate_list *rs;
 
 	if (!clk || !clk->dpll_data)
 		return ~0;
 
 	dd = clk->dpll_data;
+
+	/* It is assumed locking is handled by the caller */
+	if (dd->rate_cache_len > 0)
+		list_for_each(lp, &dd->rate_cache) {
+			rs = container_of(lp, struct dpll_rate_list, list);
+			if (rs->target_rate == target_rate) {
+				dd->last_rounded_m = rs->m;
+				dd->last_rounded_n = rs->n;
+				dd->last_rounded_rate = rs->actual_rate;
+				return rs->actual_rate;
+			}
+		}
 
 	pr_debug("clock: %s: starting DPLL round_rate, target rate %ld\n",
 		 clk->name, target_rate);
@@ -318,19 +336,50 @@ long omap2_dpll_round_rate(struct clk *clk, unsigned long target_rate)
 		if (r == DPLL_MULT_UNDERFLOW)
 			continue;
 
-//		pr_err("    clock: target=%ld %s: m = %d: n = %d: new_rate = %ld\n",
-//			 target_rate, clk->name, m, n, new_rate);
+		pr_debug("clock: target=%ld %s: m = %d: n = %d: new_rate = %ld\n",
+			 target_rate, clk->name, m, n, new_rate);
 
-		if (target_rate == new_rate ||
-			((target_rate - new_rate) > 0 && (target_rate - new_rate) < 1000000)
-		) {
-			dd->last_rounded_m = m;
-			dd->last_rounded_n = n;
-			dd->last_rounded_rate = target_rate;
-			break;
+		if (target_rate > new_rate)
+			diff = target_rate - new_rate;
+		else
+			diff = new_rate - target_rate;
+		if (diff < bestdiff) {
+			bestm = m;
+			bestn = n;
+			bestrate = new_rate;
+			bestdiff = diff;
 		}
+		if (new_rate == target_rate)
+			break;
 	}
+	/*
+	 * The following if verifies that the new frequency is within 0.01% of
+	 * the target frequency.
+	 */
+	if (bestdiff < (ULONG_MAX / 10000) &&
+	    ((bestdiff * 10000) / target_rate) < 1) {
+		dd->last_rounded_m = bestm;
+		dd->last_rounded_n = bestn;
+		dd->last_rounded_rate = bestrate;
 
-	return new_rate;
+		if (dd->rate_cache_len >= DPLL_MAX_RATE_CACHE)
+			return bestrate;
+		/*
+		 * Add new rate to the cache
+		 */
+		rs = kzalloc(sizeof(struct dpll_rate_list), GFP_ATOMIC);
+		if (rs) {
+			rs->m = bestm;
+			rs->n = bestn;
+			rs->target_rate = target_rate;
+			rs->actual_rate = bestrate;
+			if (dd->rate_cache_len == 0)
+				INIT_LIST_HEAD(&dd->rate_cache);
+			list_add(&rs->list, &dd->rate_cache);
+			dd->rate_cache_len++;
+		}
+		return bestrate;
+	} else
+		return 0;
 }
 
