@@ -6,8 +6,10 @@ g_mass_storage
 g_multi
 g_zero
 gspca_main
+hidp
 nls_cp850
 radio-wl1273
+rfcomm
 scsi_wait_scan
 snd-hwdep
 snd-mixer-oss

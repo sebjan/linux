@@ -1,3 +1,58 @@
+linux-ti-omap4 (3.1.0-1282.3) oneiric; urgency=low
+
+  [ Sebastien Jan ]
+
+  * Config: set DRM CRTCS count to 3
+  * Config: increase kernel log buffer size
+  * Config: uplevel and enable touchscreen
+  * Config: config BT as modules
+
+  [ Upstream Kernel Changes ]
+
+  * Revert "OMAP: DSS2: remove update_mode from omapdss"
+  * revert omap2plus opp DISABLE FAST BIN SPEEDS
+  * revert config disable thermal framework
+  * revert config set default governor performance
+  * Changing TSHUT thresholds to higher values
+  * Setting enable_bit flag for bandgap_fclk
+  * config errata 754322
+  * debug thermal messages as err
+  * thermal_framework bodge up init races
+  * fix fck alias on scm
+  * move smartreflex init earlier
+  * omap4 clocks detect clock rounding error
+  * omap2plus cpufreq disallow setting zero clock rate
+  * omap2plus clock fix dcc error path and solve random crashes
+  * omap4 clocks allow 1MHz leeway
+  * quench thermal debug
+  * OMAP: 4430SDP: Remove unneeded lcd config
+  * OMAP4: 4430SDP: Add panel support to board file
+  * OMAPDSS: DISPC: skip scaling calculations when not scaling
+  * OMAPDSS: HDMI: fix returned HDMI pixel clock
+  * HACK: 4430SDP: Set backlight
+  * drm/omap: don't use set_timings if it doesn't exist
+  * OMAP: DRM: auto-update mode
+  * OMAP: DSS2: Implement dsi_mux_pads for OMAP4
+  * ARM: OMAP: ctrl: Fix CONTROL_DSIPHY register fields
+  * omapdrm: check for check_timings callback
+  * omapdrm: sysfs entry for updating a manual display
+  * Restore ALSA api sanity for trigger and hw_params
+  * Improve DPLL frequency rounding code
+  * OMAP4: SDP4430: add missing vcxio regulator
+  * OMAP4: 4430SDP: Consolidate DSS regulator supplies
+  * OMAP4: SDP4430: add vaux2 regulator and audio init
+  * OMAP4460: HDMI: Disable HDMI DDC internal pull up resistor
+  * syntm12xx: Port synaptics touch screen
+  * [Blaze] Add board-blaze-touch.c: Add touch screen board file
+  * [Blaze] Board 4430 sdp file and kconfig
+  * [Blaze] Synaptics: Update the TS driver from K35
+  * [Blaze] board-blaze-touch: Add linux friendly names
+  * SDP4430: Add HDMI audio device
+  * WL12XX: fix nvs filename for 1283 device
+  * omap: blaze: Add TI-ST driver support
+
+ -- Sebastien JAN <s-jan@ti.com>  Thu, 24 Nov 2011 13:58:01 +0100
+
 linux-ti-omap4 (3.1.0-1282.2) oneiric; urgency=low
 
   [ Sebastien Jan ]
