@@ -1,3 +1,20 @@
+linux-ti-omap4 (3.1.0-1282.4) oneiric; urgency=low
+
+  [ Sebastien Jan ]
+
+  * Config: Enable thermal sensor and framework
+
+  [ Upstream Kernel Changes ]
+
+  * config drm num crtcs 3
+  * Thermal Governor: Update the actions for each thermal zone
+  * Thermal Governor: Added logging statement
+  * Thermal: Modify the panic zone to be more agressive
+  * thermal_framework align with omapzoom
+  * Remove last 256MB from being listed as "unaccessable"
+
+ -- Sebastien JAN <s-jan@ti.com>  Mon, 28 Nov 2011 15:41:09 +0100
+
 linux-ti-omap4 (3.1.0-1282.3) oneiric; urgency=low
 
   [ Sebastien Jan ]
