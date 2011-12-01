@@ -190,25 +190,17 @@ static int __init omap_l2_cache_init(void)
 		omap_smc1(0x113, por_ctrl);
 	}
 
-	if (cpu_is_omap446x()) {
-		writel_relaxed(0xa5a5, l2cache_base + 0x900);
-		writel_relaxed(0xa5a5, l2cache_base + 0x908);
-		writel_relaxed(0xa5a5, l2cache_base + 0x904);
-		writel_relaxed(0xa5a5, l2cache_base + 0x90C);
-	}
-
 	/*
-	 * FIXME: Temporary WA for OMAP4460 stability issue.
+	 * WA for OMAP4460 stability issue on ES1.0
 	 * Lock-down specific L2 cache ways which  makes effective
 	 * L2 size as 512 KB instead of 1 MB
 	 */
-	if (cpu_is_omap446x()) {
+	if (omap_rev() == OMAP4460_REV_ES1_0) {
 		lockdown = 0xa5a5;
 		writel_relaxed(lockdown, l2cache_base + L2X0_LOCKDOWN_WAY_D0);
 		writel_relaxed(lockdown, l2cache_base + L2X0_LOCKDOWN_WAY_D1);
 		writel_relaxed(lockdown, l2cache_base + L2X0_LOCKDOWN_WAY_I0);
 		writel_relaxed(lockdown, l2cache_base + L2X0_LOCKDOWN_WAY_I1);
-		goto skip_aux_por_api;
 	}
 
 skip_aux_por_api:
