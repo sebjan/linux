@@ -137,6 +137,7 @@ static int __init omap_l2_cache_init(void)
 	u32 aux_ctrl = 0;
 	u32 por_ctrl = 0;
 	u32 lockdown = 0;
+	bool mpu_prefetch_disable_errata = false;
 
 	/*
 	 * To avoid code running on other OMAPs in
@@ -144,6 +145,9 @@ static int __init omap_l2_cache_init(void)
 	 */
 	if (!cpu_is_omap44xx())
 		return -ENODEV;
+
+	if (omap_rev() == OMAP4460_REV_ES1_0)
+		mpu_prefetch_disable_errata = true;
 
 	/* Static mapping, never released */
 	l2cache_base = ioremap(OMAP44XX_L2CACHE_BASE, SZ_4K);
@@ -168,27 +172,29 @@ static int __init omap_l2_cache_init(void)
 	 */
 	aux_ctrl |= ((0x3 << L2X0_AUX_CTRL_WAY_SIZE_SHIFT) |
 		(1 << L2X0_AUX_CTRL_SHARE_OVERRIDE_SHIFT) |
-		(1 << L2X0_AUX_CTRL_DATA_PREFETCH_SHIFT) |
 		(1 << L2X0_AUX_CTRL_EARLY_BRESP_SHIFT));
+
+	if (!mpu_prefetch_disable_errata)
+		aux_ctrl |= (1 << L2X0_AUX_CTRL_DATA_PREFETCH_SHIFT);
 
 	omap_smc1(0x109, aux_ctrl);
 
 	/* Setup POR Control register */
 	por_ctrl = readl_relaxed(l2cache_base + L2X0_PREFETCH_CTRL);
-#if 0
+
 	/*
 	 * Double linefill is available only on OMAP4460 L2X0.
-	 * Undocumented bit 25 is set for better performance.
+	 * It may cause single cache line memory corruption, leave it disabled
+	 * on all devices
 	 */
-	if (cpu_is_omap446x())
-		por_ctrl |= ((1 << L2X0_PREFETCH_DATA_PREFETCH_SHIFT) |
-			(1 << L2X0_PREFETCH_DOUBLE_LINEFILL_SHIFT) |
-			(1 << 25));
-#endif
-	if (cpu_is_omap446x() || (omap_rev() >= OMAP4430_REV_ES2_2)) {
+	por_ctrl &= ~(1 << L2X0_PREFETCH_DOUBLE_LINEFILL_SHIFT);
+	if (!mpu_prefetch_disable_errata) {
+		por_ctrl |= 1 << L2X0_PREFETCH_DATA_PREFETCH_SHIFT;
 		por_ctrl |= L2X0_POR_OFFSET_VALUE;
-		omap_smc1(0x113, por_ctrl);
 	}
+
+	if (cpu_is_omap446x() || (omap_rev() >= OMAP4430_REV_ES2_2))
+		omap_smc1(0x113, por_ctrl);
 
 	/*
 	 * WA for OMAP4460 stability issue on ES1.0
