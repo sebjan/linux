@@ -316,7 +316,6 @@ struct snd_soc_dapm_path;
 struct snd_soc_dapm_pin;
 struct snd_soc_dapm_route;
 struct snd_soc_dapm_context;
-struct snd_soc_dapm_widget_list;
 
 int dapm_reg_event(struct snd_soc_dapm_widget *w,
 		   struct snd_kcontrol *kcontrol, int event);
@@ -357,21 +356,11 @@ int snd_soc_dapm_add_routes(struct snd_soc_dapm_context *dapm,
 			    const struct snd_soc_dapm_route *route, int num);
 int snd_soc_dapm_weak_routes(struct snd_soc_dapm_context *dapm,
 			     const struct snd_soc_dapm_route *route, int num);
-int snd_soc_dapm_query_path(struct snd_soc_dapm_context *dapm,
-	const char *source_name, const char *sink_name, int stream);
-const char *snd_soc_dapm_get_aif(struct snd_soc_dapm_context *dapm,
-		const char *stream_name, enum snd_soc_dapm_type type);
 
 /* dapm events */
 int snd_soc_dapm_stream_event(struct snd_soc_pcm_runtime *rtd,
 	const char *stream, int event);
 void snd_soc_dapm_shutdown(struct snd_soc_card *card);
-/* external DAPM widget events */
-int snd_soc_dapm_mixer_update_power(struct snd_soc_dapm_widget *widget,
-		struct snd_kcontrol *kcontrol, int connect);
-int snd_soc_dapm_mux_update_power(struct snd_soc_dapm_widget *widget,
-				 struct snd_kcontrol *kcontrol, int change,
-				 int mux, struct soc_enum *e);
 
 /* dapm sys fs - used by the core */
 int snd_soc_dapm_sys_add(struct device *dev);
@@ -391,13 +380,6 @@ int snd_soc_dapm_force_enable_pin(struct snd_soc_dapm_context *dapm,
 				  const char *pin);
 int snd_soc_dapm_ignore_suspend(struct snd_soc_dapm_context *dapm,
 				const char *pin);
-
-/* dapm path query */
-int snd_soc_dapm_get_connected_widgets_type(struct snd_soc_dapm_context *dapm,
-		const char *stream_name, struct snd_soc_dapm_widget_list **list,
-		int stream, enum snd_soc_dapm_type type);
-int snd_soc_dapm_get_connected_widgets_name(struct snd_soc_dapm_context *dapm,
-		const char *name, struct snd_soc_dapm_widget_list **list, int stream);
 
 /* dapm widget types */
 enum snd_soc_dapm_type {
@@ -456,7 +438,6 @@ struct snd_soc_dapm_path {
 	u32 connect:1;	/* source and sink widgets are connected */
 	u32 walked:1;	/* path has been walked */
 	u32 weak:1;	/* path ignored for power management */
-	u32 length:6;	/* path length - used by route mapper */
 
 	int (*connected)(struct snd_soc_dapm_widget *source,
 			 struct snd_soc_dapm_widget *sink);
@@ -481,8 +462,6 @@ struct snd_soc_dapm_widget {
 	unsigned char shift;			/* bits to shift */
 	unsigned int saved_value;		/* widget saved value */
 	unsigned int value;				/* widget current value */
-	unsigned int path_idx;
-	unsigned int hops;
 	unsigned int mask;			/* non-shifted mask */
 	unsigned int on_val;			/* on state value */
 	unsigned int off_val;			/* off state value */
@@ -544,10 +523,6 @@ struct snd_soc_dapm_context {
 	/* used during DAPM updates */
 	enum snd_soc_bias_level target_bias_level;
 	struct list_head list;
-
-	int num_valid_paths;
-
-	int (*stream_event)(struct snd_soc_dapm_context *dapm);
 
 #ifdef CONFIG_DEBUG_FS
 	struct dentry *debugfs_dapm;

@@ -235,11 +235,6 @@ static int omap_pcm_trigger(struct snd_pcm_substream *substream, int cmd)
 	case SNDRV_PCM_TRIGGER_PAUSE_PUSH:
 		prtd->period_index = -1;
 		omap_stop_dma(prtd->dma_ch);
-		/* Since we are using self linking, there is a
-		   chance that the DMA as re-enabled the channel
-		   just after disabling it */
-		while (omap_get_dma_active_status(prtd->dma_ch))
-			omap_stop_dma(prtd->dma_ch);
 		break;
 	default:
 		ret = -EINVAL;
@@ -285,15 +280,6 @@ static int omap_pcm_open(struct snd_pcm_substream *substream)
 					    SNDRV_PCM_HW_PARAM_PERIODS);
 	if (ret < 0)
 		goto out;
-	if (cpu_is_omap44xx()) {
-		/* ABE needs a step of 24 * 4 data bits, and HDMI 32 * 4
-		 * Ensure buffer size satisfies both constraints.
-		 */
-		ret = snd_pcm_hw_constraint_step(runtime, 0,
-					 SNDRV_PCM_HW_PARAM_BUFFER_BYTES, 384);
-		if (ret < 0)
-			goto out;
-	}
 
 	prtd = kzalloc(sizeof(*prtd), GFP_KERNEL);
 	if (prtd == NULL) {
