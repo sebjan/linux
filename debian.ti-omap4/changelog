@@ -1,3 +1,551 @@
+linux-ti-omap4 (3.1.0-1282.5) oneiric; urgency=low
+
+  [ Sebastien Jan ]
+
+  * Config: uplevel after audio update
+
+  [ Upstream Kernel Changes ]
+
+  * OMAP4460: Enable full L2 cache
+  * OMAP44xx: Optimize PL310 settings
+  * OMAP4: Modify POR Prefetch offset value.
+  * fix dss hdmi and hdmi ip driver both owning hdmi clock
+  * Workaround for mem suspend failure (correctly applied)
+  * OMAP: ASoC: Revert TILT audio sauce
+  * ASoC: dapm - Add DAPM stream completion event.
+  * ASoC: dapm - change stream event dbg to vdgb
+  * ASoC: Alchemy AC97C/I2SC audio support
+  * ASoC: Add a DB1x00 AC97 machine driver
+  * ALSA: deprecate MIPS AU1X00 AC97 driver
+  * ASoC: au1x: remove automatic DMA device registration from PSC drivers
+  * ASoC: au1x: update db1200 machine to the new way of things
+  * ASoC: au1x: use substream stream info directly
+  * ASoC: mxs: add mxs-pcm driver
+  * ASoC: mxs: add mxs-saif driver
+  * ASoC: mxs: add mxs-sgtl5000 machine driver
+  * ASoC: mxs: add asoc configuration files
+  * ASoC: Add device tree binding for WM8731
+  * ASoC: sgtl5000: add device tree probe support
+  * ASoC: Trivial formatting fix in soc-core.c
+  * ASoC: Implement new DC servo readback mode for late WM8994 revisions
+  * ASoC: Support separate left and right channel dcs_codes values
+  * ASoC: Parse board ID/revision information from WM1250-EV1 board
+  * ASoC: Remove -codec from WM8523 driver name
+  * ASoC: Remove redundant -codec from WM8580 driver name
+  * ASoC: Use new register map API for ASoC generic physical I/O
+  * ASoC: Add regmap as a control type
+  * regmap: Add kerneldoc for struct regmap_config
+  * regmap: Allow devices to specify which registers are accessible
+  * regmap: Add precious registers to the driver interface
+  * ASoC: Remove unneeded -codec from WM8753 driver name
+  * regmap: Fix kerneldoc errors for regmap
+  * ASoC: Update SMDKs for WM8580 -codec removal
+  * ASoC: Remove some more redundant -codecs from driver names
+  * ASoC: Refactor WM8741 regulator handling into CODEC generic code
+  * ASoC: Add SPI support for WM8741
+  * ASoC: Fix warning in WM1250-EV1 driver
+  * ASoC: Specify register defaults for WM8958 MICBIAS1 and MICBIAS2
+  * ASoC: soc-io: Add CONFIG_REGMAP_I2C/CONFIG_REGMAP_SPI guards for
+    regmap_init_i2c/regmap_init_spi
+  * ASoC: sgtl5000: fix module device table type for sgtl5000_dt_ids
+  * ASoC: Allow userspace control of Speyside headphone output
+  * ASoC: soc-io: Fix CONFIG_REGMAP_I2C/SPI guards to support regmap
+    modules
+  * ASoC: Add bitfield definitions for WM8958 MICBIAS registers
+  * ASoC: Add device tree binding for WM8510
+  * ASoC: Add device tree binding for WM8523
+  * ASoC: Add device tree support for WM8580
+  * ASoC: Add device tree binding for WM8711
+  * ASoC: Add device tree binding for WM8728
+  * ASoC: Add device tree binding for WM8737
+  * ASoC: Add device tree binding for WM8750
+  * ASoC: Add device tree binding for WM8753
+  * ASoC: Add VMID widget for wm_hubs devices
+  * ASoC: Disable WM8994 VMID for digital only paths
+  * ASoC: Remove redundant -codec from WM8750
+  * ASoC: Support !CONFIG_REGMAP builds
+  * ASoC: s6000-pcm: remove unused variable 'dai'
+  * ASoC: soc-cache: Remove unneeded codec_drv pointer variable in
+    snd_soc_flat_cache_init
+  * ASoC: soc-cache: Remove unneeded codec_drv pointer variable in
+    snd_soc_lzo_get_blksize
+  * ASoC: soc-pcm: Remove unused global mutex
+  * ASoC: nuc900-pcm: remove unused variable 'dai'
+  * ASoC: sta32x: shortcut the for loop to get ir and mcs
+  * ASoC: Add device tree binding for WM8741
+  * ASoC: Correct revision display for WM1250-EV1 module
+  * ASoC: Disable pulls on WM8994 AIF2 when starting it
+  * ASoC: DAPM: Allow multiple mixer sources to be routed via the same
+    switch
+  * ASoC: Run Speyside WM8962 at 512fs
+  * ASoC: Add WM8958 noise gate support
+  * ASoC: Implement WM8994 thermal warning and shutdown interrupt support
+  * ASoC: Add ADAU1373 codec support
+  * ASoC: Blackfin: ADAU1373 eval board support
+  * ASoC: claim the IRQ when the fsl_ssi device is probed, not opened
+  * ASoC: Fix backport of WM8994 thermal warning
+  * ASoC: fsl: fix build warning in fsl_dma
+  * ASoC: Remove unreachable code in au1xac97c_drvprobe and
+    au1xi2s_drvprobe
+  * ASoC: sta32x: Move resource allocation and release to the corresponding
+    callback functions
+  * regmap: Allow drivers to specify register defaults
+  * ASoC: Automatically manage WM8996 MICBIAS regulating mode
+  * ASoC: Optimise WM8996 no interrupt path
+  * ASoC: Add basic WM8962 capture low/high pass filter control
+  * ASoC: Initial WM8962 DSP2 support
+  * ASoC: Report IRQ_NONE when we don't see an interrupt from WM8962
+  * ASoC: Provide more detail on WM8962 thermal shutdown status
+  * ASoC: Convert WM8523 to table based control and DAPM initialization
+  * ASoC: Allow idle_bias_off to be specified in CODEC drivers
+  * ASoC: mxs-saif: clear clk gate first before register setting
+  * sound/soc/mxs/mxs-saif.c: add missing kfree
+  * ASoC: mxs-sgtl5000: add record function
+  * ASoC: SAMSUNG: Add Kconfig to support SMDK4212
+  * ASoC: davinci-mcasp: add support for unsigned PCM formats
+  * ASoC: Add 3D stereo support for wm8996
+  * ASoC: imx-ssi: use dma_writecombine consistently
+  * ASoC: imx: use more robust checking of available streams
+  * ASoC: soc_codec_reg_show use snd_soc_codec_readable_register
+  * ASoC: Allow register defaults to be larger than unsigned short
+  * ASoC: Remove unused mutex from WM9090 driver
+  * ASoC: Remove redundant -codec from WM8776 driver name
+  * ASoC: Add device tree binding for WM8770
+  * ASoC: Add device tree binding for WM8776
+  * ASoC: Add device tree binding for WM8804
+  * ASoC: Allow source specification for CODEC level sysclk
+  * ASoC: sn95031: Fix the logic to find free channel
+  * ASoC: Add missing platform_device_put in raumfeld_audio_init error path
+  * ASoC: Check that WM8996 FLL started even if we don't have the IRQ
+  * ASoC: alc5623: Remove unused mutex
+  * ASoC: Remove unused step size from debugfs CODEC write function
+  * ASoC: ad1980: Return proper error if vendor id mismatch
+  * ASoC: sst_platform: trivial coding style fix
+  * ASoC: sst_platform: using builtin function
+  * ASoC: sst_platform: fix memory leak
+  * ASoC: playpaq_wm8510: Return proper error if clk_get fails
+  * regmap: Provide device read and write map interface for merging
+  * ASoC: ad193x: Setup regmap read and write flag masks for SPI
+  * regulator: Implement deferred disable support
+  * ASoC: Disable WM8996 CPVDD supply when not in use
+  * ASoC: Correct channel numbers for WM8996 AIF2
+  * ASoC: improve asynchronous mode support in the fsl_ssi driver
+  * ASoC: samsung: Fix checking return value of clk_get
+  * ASoC: Fix WM8996 DC servo operation without IRQ
+  * ASoC: support sample sizes properly in the WM8776 codec driver
+  * ASoC: snappercl15: convert to use snd_soc_register_card()
+  * ARM: ep93xx: simone: register audio platform device
+  * ARM: ep93xx: edb93xx: register audio platform device
+  * ARM: ep93xx: snappercl15: register audio platform device
+  * ASoC: ep93xx-pcm: add MODULE_ALIAS
+  * ASoC: simone: convert to use snd_soc_register_card()
+  * ASoC: edb93xx: convert to use snd_soc_register_card()
+  * ASoC: davinci-pcm: trivial: replace link with actual chan/link
+  * ASoC: tpa6130a2: Remove obsolete cleanup for clientdata
+  * ASoC: wm8995: Return -EINVAL if device ID mismatch
+  * ASoC: wm8995: Remove unused i2c variable in wm8995_remove()
+  * ASoC: support all possible sample rates in the WM8776 driver
+  * ASoC: Display the error code when we fail to add a DAPM control
+  * ASoC: WM8996 only needs bandgap for analogue functionality
+  * ASoC: Initial WM8996 headphone impedance measurement support
+  * ASoC: Add line loads to the list of supported detections for Speyside
+  * ASoC: sn95031: Staticize sn95031_pcm_hw_params
+  * ASoC: mxs-saif: add record function
+  * MFD: twl6040: Remove global pointer for platform_device
+  * MFD: twl6040: Add accessor for revision ID
+  * Input: twl6040-vibra: Use accessor to get revision information
+  * MFD: twl6040: Fix power on GPIO handling
+  * ASoC: twl6040: Chip initialization cleanup
+  * ASoC: twl6040: Use chip defaults in the initial reg_cache
+  * ASoC: twl6040: Fix the number of channels for vibra
+  * ASoC: twl6040: Correct supported number of playback channels
+  * ASoC: Fix unused variable warning in WM8996
+  * ASoC: Refcount WM8996 bandgap from FLL too
+  * ASoC: fsl: Fix error handling if platform_device_add fails
+  * ASoC: ssm2602: Do not dereference codec->control_data
+  * ASoC: Add WM5100 driver
+  * ASoC: Trace and collect statistics for DAPM graph walking
+  * ASoC: Factor out per-widget DAPM power checks
+  * ASoC: Staticise bf5xx_pcm_ac97_new()
+  * ASoC: Staticise bf5xx_pcm_i2s_new()
+  * ASoC: Staticise jz4740_pcm_new()
+  * ASoC: Staticise nuc900_dma_getposition()
+  * ASoC: Add driver for rt5631
+  * ASoC: 88pm860x-codec - Allow independent use of both I2S playback and
+    capture
+  * ASoC: 88pm860x-codec - reset the codec correctly
+  * ASoC: soc-core: symmetry checking for each DAIs separately
+  * ASoC: tpa6130a2: Model support cleanup
+  * ASoC: tpa6130a2: Remove model_id from platform data
+  * OMAP: McPDM: Convert McPDM device to omap_device
+  * ASoC: omap-mcpdm: Fix threshold and dma configuration
+  * ASoC: OMAP4: McPDM: Convert to hwmod/omap_device
+  * ASoC: omap-mcpdm: Replace legacy driver
+  * ASoC: Include delay.h in 88pm860x
+  * ASoC: twl6040: Lower the power on gain values at startup
+  * ASoC: twl6040: Fix comments for register names
+  * ASoC: twl6040: Remove strings "NULL" from DAPM route
+  * ASoC: twl6040: Introduce SW only shadow register
+  * ASoC: twl6040: Earphone path correction
+  * ASoC: twl6040: Use consistent names for Handsfree path
+  * ASoC: twl6040: Use consistent names for Headset path
+  * ASoC: twl6040: Support for AUX L/R output
+  * ASoC: twl6040/sdp4430: Change legacy DAI name
+  * ASoC/MFD: twl6040: Combine bit definitions for Headset control
+    registers
+  * ASoC: Dynamically manage DBVDD2 and DBVDD3 on WM5100
+  * ASoC: Add another DAPM stat for neighbour checks
+  * ASoC: Add missed BCLK rate to WM5100 driver
+  * ASoC: Add Kconfig and Makefile entries for rt5631 codec
+  * ASoC: omap-mcpdm: Correct the supported number of channels
+  * ASoC: twl6040: No need to read the INTID register
+  * ASoC: Staticize rt5631_dai
+  * ASoC: Staticize sn95031_dais
+  * ASoC: Remove unneeded mutex_init in wl1273_probe()
+  * ASoC: Add missed free_irq in wm5100_remove and wm5100_probe error path
+  * ASoC: Support a wider range of sample rates on Speyside WM8962
+  * ASoC: Rename WM8962 DMIC widget to DMIC_ENA
+  * ASoC: Convert WM8962 MICBIAS to a supply widget
+  * ASoC: Add support for on-board analogue microphones on Speyside WM8962
+  * ASoC: Add DMIC control to Speyside WM8962 board
+  * ASoC: Don't force bias on ground referenced devices
+  * ASoC: Add platform data for WM1250 EV1 GPIOs
+  * ASoC: Set idle_bias_off for WM1250 EV1
+  * =?UTF-8?q?ASoC:=20omap-mcbsp:=20Fix=20compile=20time=20warning=20about=
+    20ambiguous=20=E2=80=98else=E2=80=99?=
+  * ASoC: Drop exporting sn95031_get_mic_bias
+  * ASoC: Drop exporting ad1980_dai
+  * ASoC: twl6040: Read the TRIM values from the chip
+  * ASoC: twl6040: Function to fetch the TRIM values
+  * ASoC: omap-mcpdm: API to configure offset cancellation
+  * ASoC: sdp4430: Configure McPDM offset cancellation
+  * ASoC: twl6040: Rename pga_event to out_drv_event
+  * ASoC: twl6040: Combine the custom volsw get, and put functions
+  * ASoC: twl6040: Move delayed_work struct inside twl6040_output for HS/HF
+  * ASoC: twl6040: Move the delayed_work for HS detection under
+    twl6040_jack_data
+  * ASoC: twl6040: No need to change delay during HS ramp
+  * ASoC: twl6040: No need to change delay during HF ramp
+  * ASoC: Remove unused fields in struct mfld_mc_private
+  * ASoC: Staticise sst_platform_dai
+  * ASoC: ssm2602: Set initial bias level to standby
+  * ASoC: ssm2602: Support setting the oscillator and the clock output
+    state
+  * ASoC: Add DRC control for WM8996
+  * ASoC: Add device ID for WM9093 to WM9090 driver
+  * ASoC: Remove unused "control_data" field of struct wm8940_priv
+  * ASoC: Remove unused "control_data" field of struct wm8960_priv
+  * ASoC: Remove unused "control_data" field of struct wm8978_priv
+  * ASoC: Remove unused "control_data" field of struct wm9081_priv
+  * ASoC: Remove unused "control_data" field of struct wm9090_priv
+  * ASoC: Remove unused "control_data" field of struct wm8904_priv
+  * ASoC: Fix setting adau1373_dai->master for SND_SOC_DAIFMT_CBS_CFS
+  * ASoC: adau1701: Initialize codec->control_data before using it
+  * ASoC: Remove unused "control_data" field of struct alc5623_priv
+  * ASoC: Remove unused "control_data" field of struct cs4270_private
+  * ASoC: Remove unused "control_data" field of struct cs42l51_private
+  * ASoC: Remove unused "control_data" field of struct max98088_priv
+  * ASoC: Remove unused "control_data" field of struct max98095_priv
+  * ASoC: Remove unused "control_data" field of struct ak4671_priv
+  * ASoC: adau1701: Fix prototype for adau1701_set_sysclk
+  * ASoC: Allow DAI formats to be specified in the dai_link
+  * ASoC: Use dai_fmt in speyside_wm8962
+  * ASoC: Also count neighbour checks for supplies
+  * ASoC: tlv320dac33: Add guarding parentheses to macros
+  * ASoC: Fix a bug in WM8962 DSP_A and DSP_B settings
+  * ASoC: Staticise non-exported symbols in rt5631
+  * ASoC: Remove unused function check_vdac_to_outmix from rt5631
+  * ASoC: Remove unused "control_data" field of struct cs4271_private
+  * ASoC: Davinci: Fix FS polarity for I2S format
+  * ASoC: sdp4430: Fix string for FM input name
+  * ASoC: Remove unused "control_data" field of struct aic3x_priv
+  * ASoC: Add missed regulator_unregister_notifier and regulator_bulk_free
+    in wm8995_remove
+  * ASoC: sn95031: Do not use static variable for channel_index
+  * ASoC: omap-mcbsp: Fix FS polarity for LEFT_J, DSP_A and DSP_B formats
+  * ASoC: twl6040: One workqueue should be enough
+  * ASoC: twl6040: correct loop counters for HS/HF ramp code
+  * ASoC: twl6040: Shift 2 identifies the HS output in out_drv_event
+  * ASoC: twl6040: Simplify code in out_drv_event for pending work check
+  * ASoC: tlv320aic3x: Use driver_data field of struct i2c_device_id to
+    identify models
+  * ASoC: omap-mcbsp: Prepare for init time DAI format setting
+  * ASoC: omap: Convert bunch of machine drivers to use init time DAI
+    format
+  * ASoC: omap: Use single hw_params callback in sdp3430 and zoom2
+  * ASoC: wm8782: Add __devexit_p at necessary place
+  * ASoC: kirkwood-i2s: Add __devexit_p at necessary place
+  * ASoC: samsung: Add __devexit_p at necessary places
+  * ASoC: tegra: Staticise tegra_i2s_dai and tegra_spdif_dai
+  * ASoC: Staticise samsung_spdif_dai
+  * ASoC: Staticise sh4_ssi_dai
+  * ASoC: Remove unused rate variable in magician_playback_hw_params
+  * ASoC: Remove unused srate variable in tegra_spdif_hw_params
+  * ASoC: imx: eukrea_tlv320 needs i2c
+  * ASoC: sh: use correct __iomem annotations
+  * ASoC: Remove needless codec->dapm.bias_level assignment to
+    SND_SOC_BIAS_OFF
+  * ASoC: Staticise simtec_audio_resume()
+  * ASoC: Staticise ep93xx_ac97_dai
+  * ASoC: txx9: Add __exit_p at necessary place
+  * ASoC: Fix setting update bits for WM8741_DACRMSB_ATTENUATION
+  * ASoC: samsung: WM8994 depends on MFD_WM8994
+  * ASoC: samsung: s3c-i2s-v2.c needs module.h
+  * ASoC: Instantiate DAPM widgets before we do the DAI link init
+  * ASoC: Fix typo in 24.576MHz rate in WM5100
+  * mfd: Add WM1811 support
+  * ASoC: Add WM1811 support
+  * ASoC: max98088 codec: Catch driver bugs for eq channel name
+  * ASoC: max98095 codec: Catch driver bugs for biquad channel name
+  * ASoC: wm8711: Use snd_soc_update_bits for read-modify-write
+  * ASoC: wm8971: Use snd_soc_update_bits for read-modify-write
+  * ASoC: wm8988: Use snd_soc_update_bits for read-modify-write
+  * ASoC: omap-pcm: Fix the no period wakeup implementation
+  * ASoC: wm8994: Slightly optimize configure_clock
+  * ASoC: wm8995: Slightly optimize configure_clock
+  * ASoC: wm8994: Fix setting rate_reg for wm8994-aif2
+  * ASoC: Avoid writing to WM8971_RESET in wm8971_resume
+  * ASoC: wm8750: Use snd_soc_update_bits for read-modify-write
+  * ASoC: wm8988: Use snd_soc_update_bits for read-modify-write
+  * ASoC: wm8711: Use snd_soc_update_bits for read-modify-write
+  * ASoC: Remove unneeded hw_write initialisation in ak4671
+  * ASoC: Remove unneeded hw_write initialisation in wm8523
+  * ASoC: core: Introduce SOC_DOUBLE_VALUE macro
+  * ASoC: core: Introduce SOC_DOUBLE_R_VALUE macro
+  * ASoC: twl6040: Simplify custom put_volsw callback
+  * ASoC: Remove direct register cache accesses from WM8962 driver
+  * regulator: Fix return code from regulator_disable_deferred()
+  * ASoC: Factor write of widget power out into a separate function
+  * ASoC: Move bias level decision into main dapm_power_widgets()
+  * ASoC: Ensure all DAPM widgets have a power check callback
+  * ASoC: Factor out widget power check operation
+  * ASoC: Mark headphone, mic, speaker and line widgets as always connected
+  * ASoC: Do DAPM power checks only for widgets changed since last run
+  * ASoC: Reduce the number of neigbours we mark dirty when updating power
+  * ASoC: Add verbose debugging showing why widgets get marked dirty
+  * ASoC: Only run power_check() on a widget once per run
+  * ASoC: Don't mark the outputs of supplies as dirty on state changes
+  * ASoC: Stop checking for supplied widgets after we find the first
+  * ASoC: Use dapm_mark_dirty() for new DAPM widgets for consistency
+  * ASoC: Consolidate use of controls with custom get/put function
+  * ASoC: twl6040: Simplify custom get_volsw callback
+  * ASoC: twl6040: Prepare for core put_volsw/volsw_2r merger
+  * ASoC: core: Change SOC_SINGLE/DOUBLE_VALUE representation
+  * ASoC: core: Combine snd_soc_info_volsw/info_volsw_2r functions
+  * ASoC: core: Combine snd_soc_get_volsw/get_volsw_2r functions
+  * ASoC: core: Combine snd_soc_put_volsw/put_volsw_2r functions
+  * ASoC: twl6040: Simply call snd_soc_put_volsw form the custom code
+  * ASoC: core: Remove snd_soc_put_volsw_2r definition
+  * ASoC: twl6040: Warn user in twl6040_put_volsw for error case
+  * ASoC: Remove unused function declaration in imx-ssi.h
+  * ASoC: imx: Remove unused variable 'dai'
+  * ASoC: Remove unused variable 'wm9090' in wm9090_probe
+  * ASoC: Remove references to linux@wolfsonmicro.com
+  * ASoC: Replace remaining use of *_volsw_2r with *_volsw
+  * ASoC: Ensure DAPM widgets are set up before we sync jacks
+  * ASoC: tlv320aic32x4 fix initialization of micpga routing
+  * ASoC: fix codec breakage caused by the volsw/volsw_2r merger
+  * ASoC: wm8990: Convert to snd_soc_cache_sync for sync reg_cache with the
+    hardware
+  * ASoC: wm8990: Remove incorrect comments
+  * ASoC: Return early with -EINVAL if invalid dai format is detected
+  * regulator: Add WM1811 support
+  * ASoC: Suppress early calls to snd_soc_dapm_sync()
+  * ASoC: Remove redundant snd_soc_dapm_sync() calls from machine drivers
+  * ASoC: Ensure all DAPM widgets are instantiated with the card
+  * ASoC: Assign power_check when we allocate DAPM widgets
+  * ASoC: Cache connected input and output recursions
+  * ASoC: Squash error codes from regmap down to -1 on read
+  * ASoC: Fix DAPM sync for TLV320AIC3x custom DAPM widget
+  * ASoC: wm8510: Convert to snd_soc_cache_sync
+  * ASoC: wm8711: Convert to snd_soc_cache_sync
+  * ASoC: wm8731: Convert to snd_soc_cache_sync
+  * ASoC: wm8750: Convert to snd_soc_cache_sync
+  * ASoC: wm8776: Convert to snd_soc_cache_sync
+  * ASoC: wm8940: Convert to snd_soc_cache_sync
+  * ASoC: wm8960: Convert to snd_soc_cache_sync
+  * ASoC: wm8971: Convert to snd_soc_cache_sync
+  * ASoC: wm8974: Convert to snd_soc_cache_sync
+  * ASoC: wm8988: Convert to snd_soc_cache_sync
+  * ASoC: ak4535: convert to soc-cache
+  * ASoC: fix checkpatch.pl error in omap-mcbsp
+  * ASoC: Convert Simtec machines to table based DAPM init
+  * ASoC: Convert H1940 to table based init
+  * ASoC: Convert RX1950 to table based init
+  * ASoC: Convert SmartQ to table based init
+  * ASoC: Convert SMDK WM8580 to table based DAPM init
+  * ASoC: Convert Jive to table based init
+  * ASoC: OMAP machines: Remove soc_dapm_sync() call from init
+  * ASoC: zoom2: Let core to deal with the DAPM widgets
+  * ASoC: zoom2: No need to call dapm_pin_enable at init time
+  * ASoC: sdp4430: Let core to deal with the DAPM widgets
+  * ASoC: sdp4430: No need to call dapm_pin_enable at init time
+  * ASoC: am3517evm: Let core to deal with the DAPM widgets
+  * ASoC: n810: Let the core to register DAPM widgets/routes and controls
+  * ASoC: osk5912: Let core to deal with the DAPM widgets
+  * ASoC: sdp3430: Let core to deal with the DAPM widgets
+  * ASoC: Convert Goni to data based DAPM init
+  * ASoC: Writing register default value for the reset register
+  * ASoC: twl6040: Convert to table based init
+  * ASoC: twl4030: Convert to table based init
+  * ASoC: tlv320dac33: Convert to table based init
+  * ASoC: Fix typo in Kconfig symbol for tlv320aic32x4
+  * ASoC: Add missing default for WM5100 Clocking 1
+  * ASoC: Implement WM5100 accessory detection support
+  * ASoC: Instantiate card widgets immediately
+  * ASoC: ak4642: convert to soc-cache
+  * ASoC: Delete ads117x.h
+  * ASoC: Remove impossible case from wm8994_hw_params
+  * ASoC: da7210: convert to soc-cache
+  * Input: twl6040: Simplify vibra regsiter definitions
+  * MFD: twl6040: Cache the vibra control registers
+  * MFD: twl6040: function to query the vibra status for clients
+  * Input: twl6040-vibra: Check the selected path for vibra
+  * ASoC: twl6040: Support for vibra output paths
+  * ASoC: twl6040: Workaround for headset DC offset caused pop noise
+  * ASoC: da7210: Add support for other DAI word lengths, format and mode
+  * ASoC: Make SND_SOC_SAARB and SND_SOC_TAVOREVB3 select MFD_88PM860X
+  * ASoC: pxa: Remove redundant snd_soc_dapm_sync() calls from machine
+    drivers
+  * ASoC: sta32x: Set reg_cache_default to sta32x_regs
+  * ASoC: sta32x: Write the register default value to cache for reserved
+    registers
+  * ASoC: ak4642: fixup cache register table
+  * ASoC: ak4535: fixup cache register table
+  * ASoC: Update WM5100 accessory detection for revision A
+  * ASoC: twl6040: Remove Capture restriction for 17.64MHz sysclk
+  * ASoC: twl6040: Remove PLL usage restrictions
+  * ASoC: twl6040: Change event ordering for Earphone driver
+  * ASoC: twl6040: Rename the Earphone Driver event handler
+  * ASoC: tlv320aic32x4: Use snd_soc_update_bits for read-modify-write
+  * ASoC: Convert DA7210 to table based DAPM init
+  * ASoC: tlv320aic23: convert to soc-cache
+  * ASoC: alc5623: Convert codec->hw_read to snd_soc_read
+  * ASoC: tlv320aic3x: Convert codec->hw_read to snd_soc_read
+  * ASoC: wm8961: Convert codec->hw_read to snd_soc_read
+  * ASoC: wm8991: Fix wrong bit setting for WM8991_POWER_MANAGEMENT_2
+  * ASoC: wm8991: Use snd_soc_update_bits for read-modify-write
+  * ASoC: wm8400: Fix wrong bit setting for WM8400_POWER_MANAGEMENT_2
+  * ASoC: wm8990: Fix wrong bit setting for WM8990_POWER_MANAGEMENT_2
+  * ASoC: wm8990: Use snd_soc_update_bits for read-modify-write
+  * ASoC: ad193x: Fix define of AD193X_PLL_INPUT_MASK
+  * ASoC: da7210: bugfix for head phone volume control
+  * ASoC: core: Add flag to ignore pmdown_time at pcm_close
+  * ASoC: twl6040: Request core to inline the DAPM sequence
+  * MAINTAINERS: Add maintainer for Analog Devices sound CODECs
+  * ASoC: Tegra: sparse cleanup
+  * ASoC: da7210: Add support for ADC & DAC equalizers
+  * ASoC: da7210: Add support for High pass and Voice filters for ADC and
+    DAC
+  * MANITAINERS: Add Cragganmore reference platform to Wolfson support
+  * ASoC: wm8741: Fix setting interface format for DSP modes
+  * ASoC: wm8741: Use snd_soc_cache_sync to sync reg_cache with the
+    hardware
+  * ASoC: wm8900: Fix wrong mask for setting
+    DAC_CLKDIV/ADC_CLKDIV/LRCLK_MODE
+  * ASoC: wm8900: Fix the mask defines
+  * ASoC: wm8900: Use snd_soc_update_bits for read-modify-write
+  * ASoC: wm8580: Use snd_soc_update_bits for read-modify-write
+  * ASoC: Update WM1811 DCS codes for latest evaluation results
+  * ASoC: Convert WM9081 to table based control init
+  * ASoC: Fix prefixing of DAPM controls
+  * ASoC: ad193x: Use snd_soc_update_bits for read-modify-write
+  * ASoC: sgtl5000: Fix define for SGTL5000_BIAS_R_MASK
+  * ASoC: sgtl5000: Fix setting mic bias resistor
+  * ASoC: WM9081 interrupt status register is volatile
+  * ASoC: ssm2602: Use snd_soc_update_bits for read-modify-write
+  * ASoC: ak4641: Remove unused codec field from struct ak4641_priv
+  * ASoC: da7210: Add support for mute and zero cross controls
+  * ASoC: da7210: Add support for ALC and Noise suppression
+  * ASoC: ak4641: Use SND_SOC_DAPM_DAC for Voice Playback stream widget
+  * ASoC: wm9081: Fix setting soft VMID ramp enable with VMID 2*240k
+  * ASoC: Fix reg_word_size for ak4104
+  * ASoC: ak4671: Use snd_soc_update_bits for read-modify-write
+  * ASoC: rt5631: Remove unused codec field from struct rt5631_priv
+  * ASoC: wm8994: Use SND_SOC_DAPM_AIF_OUT for AIF3 Capture
+  * ASoC: wm8996: Use SND_SOC_DAPM_AIF_OUT for AIF2 Capture
+  * ASoC: Set sgtl5000->ldo in ldo_regulator_register
+  * ASoC: Use SGTL5000_LINREG_VDDD_MASK instead of hardcoded mask value
+  * ASoC: da7210: Add support for DAPM
+  * ASoC: da7210: Add support for line out and DAC
+  * ASoC: wm8996: Fix wrong mask for setting WM8996_AIF_CLOCKING_2
+  * ASoC: sgtl5000: Fix wrong mask in some snd_soc_update_bits calls
+  * ASoC: keep pointer to resource so it can be freed
+  * ASoC: max98095: Convert codec->hw_write to snd_soc_write
+  * ASoC: wm8940: Properly set codec->dapm.bias_level
+  * mfd: twl - twl6030 enable all irq sources (temp fix)
+  * ASoC: OMAP4 PCM - make sure self linked DMA is really stopped (fixme)
+  * OMAP: AESS: Add omap_device for AESS
+  * OMAP: DIMC - Add Digital Mic omap_device
+  * ASoC: dai - Add basic widget channel information
+  * ASoC: dapm - Add API call to query valid DAPM paths.
+  * ASoC: dapm - allow custom widgets to update power events.
+  * ASoC: dsp - Add ASoC DSP core
+  * ASoC: dsp - Add DSP support to core ASoC API/structures
+  * ASoC: dsp - add DSP support to ASoC core.
+  * ASoC: core - module refcounting improvements fro DSP
+  * ALSA: core - make sure dynamic minors is enabled for OMAP4 ABE
+  * ASoC: core - add dynamic kcontrols
+  * ALSA: pcm - add support for hostless audio
+  * ALSA: pcm - reject calls to open backend PCMs (temporary)
+  * ASoC: core - add hostless DAI support
+  * ASoC: dsp - add core support for bespoke trigger()
+  * OMAP4: OPP: Add OPPs for AESS
+  * ASoC: OMAP4 ABE DAI - Add OMAP4 ABE DAI support
+  * ASoC: OMAP4 ABE DSP - Add support for the OMAP4 ABE DSP
+  * ASoC: OMAP4 - DMIC DAI driver
+  * ASoC: OMAP4 - ABE port manager
+  * ASoC: sdp4430 - add ABE support to machine driver
+  * ASoC: sdp4430 - add support for Pandaboard.
+  * ASoC: sdp4430 - enable boost hands free converter
+  * ASoC: sdp4430 - Add Mic Bias for DMic0, DMic1 and DMic2
+  * ASoC: sdp4430 - Add Mic Bias for digital mics in legacy mode
+  * ASoC: sdp4430 - updates authors and email addresses
+  * ASoC: sdp4430 - Reduce McPDM shutdown delay
+  * ASoC: OMAP ABE: update Firmware version 09.51
+  * ASoC: twl6040: Configure init gain to minimal value
+  * ASoC: core - add platform DAPM debugfs support
+  * ASoC: core - Free platform DAPM context.
+  * ASoC: dapm - propagate stream events to platforms
+  * ARM: OMAP4: Enable threshold mode for OMAP4 McBSP
+  * plat-omap: mcbsp: Move WAKEUPEN configuration to omap_mcbsp_config
+  * OMAP4: McBSP: Clear rx_irq at probe time
+  * OMAP4: McBSP: Change fclk source names per OMAP version
+  * OMAP4: McBSP: Set clks_prcm_src based on instance id
+  * ASoC: DAPM: Add card stream event notification
+  * ASoC: twl6040: Update HSOTRIM/HFOTRIM in register cache
+  * ASoC: DAPM: Allow reading DAPM widget power state
+  * ASoC: core: Search CODEC in a SoC card
+  * ASoC: sdp4430 - full modem and BT support and DC offset cancellation
+    with ABE
+  * ASoC: sdp4430: Disable pcm for SPDIF for now
+  * ASoC: omap-mcpdm: Add ABE support
+  * OMAP4: Panda: Fix Panda board config for Audio
+  * ASoC: core - init the RTD delayed work
+  * ASoC: DAPM - tmp workaround for deadlock report.
+  * ASoc: dapm - check for codec context in stream events.
+  * ASoC: dapm - reset dapm cache prior to getting connected widgets.
+  * ASoC: dapm - fix connected widget checks
+  * ASoC: pcm - dynamic PCM core fix to get connected widgets and error
+    management
+  * ASoC: OMAP ABE: Update ports in order to support 44.1 KHz
+  * ASoC: DAPM: Add private data pointer for DAPM widget
+  * ASoC: dapm: Add codec/platform DAPM stream event
+  * ASoC: twl6040: Add digital mute
+  * ASoC: TWL6040: HACK for ABE support of 44.1 kHz
+  * OMAP4/5: HDMI: Add OMAP4/5 device for HDMI audio CPU DAI
+  * OMAP4: Add device for HDMI OMAP4 audio for ASoC machine driver
+  * omap2plus devices disable hdmi audio re register
+  * omap2plus opp add 4460 aes opps
+  * gpio1 defeat reset
+  * omap4: Enable Ubuntu friendly settings
+  * omap4: enable musb
+  * omap4: configure BT as modules
+  * DRM: OMAP: Fix Kbuild header entry for omap_drm.h
+  * omap4: set performance governor as default
+
+ -- Sebastien JAN <s-jan@ti.com>  Wed, 07 Dec 2011 10:14:41 +0100
+
 linux-ti-omap4 (3.1.0-1282.4) oneiric; urgency=low
 
   [ Sebastien Jan ]
