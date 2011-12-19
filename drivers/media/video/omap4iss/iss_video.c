@@ -350,11 +350,17 @@ iss_video_check_format(struct iss_video *video, struct iss_video_fh *vfh)
  * Video queue operations
  */
 
+static int iss_video_queue_setup(struct vb2_queue *q, unsigned int *num_buffers,      
+                           unsigned int *num_planes, unsigned long sizes[],     
+                           void *alloc_ctxs[])
+/*
 static int iss_video_queue_setup(struct vb2_queue *vq, const struct v4l2_format *fmt,
 				 unsigned int *count, unsigned int *num_planes,
 				 unsigned int sizes[], void *alloc_ctxs[])
+*/
 {
-	struct iss_video_fh *vfh = vb2_get_drv_priv(vq);
+
+	struct iss_video_fh *vfh = vb2_get_drv_priv(q);
 	struct iss_video *video = vfh->video;
 
 	/* Revisit multi-planar support for NV12 */
@@ -366,7 +372,11 @@ static int iss_video_queue_setup(struct vb2_queue *vq, const struct v4l2_format 
 
 	alloc_ctxs[0] = video->alloc_ctx;
 
-	*count = min(*count, (unsigned int)(video->capture_mem / PAGE_ALIGN(sizes[0])));
+	if (!*num_buffers)
+		*num_buffers = 32;
+
+	*num_buffers = (unsigned int)min(*num_buffers, (unsigned int)
+				  (video->capture_mem / PAGE_ALIGN(sizes[0])));
 
 	return 0;
 }
@@ -390,7 +400,7 @@ static int iss_video_buf_prepare(struct vb2_buffer *vb)
 	if (vb2_plane_size(vb, 0) < size)
 		return -ENOBUFS;
 
-	addr = vb2_dma_contig_plane_dma_addr(vb, 0);
+	addr = vb2_dma_contig_plane_paddr(vb, 0);
 	if (!IS_ALIGNED(addr, 32)) {
 		dev_dbg(video->iss->dev, "Buffer address must be "
 			"aligned to 32 bytes boundary.\n");
