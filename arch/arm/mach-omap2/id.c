@@ -226,11 +226,13 @@ void __init omap4xxx_check_features(void)
 		case 2:
 			/* High performance device */
 			omap_features |= OMAP4_HAS_MPU_1_5GHZ;
+			omap_features |= OMAP4_HAS_IVA_500MHZ;
 			break;
 		case 1:
 		default:
 			/* Standard device */
 			omap_features |= OMAP4_HAS_MPU_1_2GHZ;
+			omap_features |= OMAP4_HAS_IVA_430MHZ;
 			break;
 		}
 	}
