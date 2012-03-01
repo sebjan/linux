@@ -1256,13 +1256,13 @@ static void __init omap_5430evm_init(void)
 	omap_serial_init();
 	platform_device_register(&dummy_sd_regulator_device);
 	omap2_hsmmc_init(mmc);
-	omap_ehci_ohci_init();
 #if 0
+	omap_ehci_ohci_init();
 	status = omap4_keyboard_init(&evm5430_keypad_data, &keypad_data);
 	if (status)
 		pr_err("Keypad initialization failed: %d\n", status);
-#endif
 	omap5evm_display_init();
+#endif
 }
 
 static void __init omap_5430evm_map_io(void)
