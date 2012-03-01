@@ -293,10 +293,15 @@ int valid_phys_addr_range(unsigned long addr, size_t size)
  * We don't use supersection mappings for mmap() on /dev/mem, which
  * means that we can't map the memory area above the 4G barrier into
  * userspace.
+ * Hack for omap5432 with more than 2GB: extend allowed physical
+ * addresses range
  */
 int valid_mmap_phys_addr_range(unsigned long pfn, size_t size)
 {
-	return !(pfn + (size >> PAGE_SHIFT) > 0x00100000);
+	unsigned long end_pfn = pfn + (size >> PAGE_SHIFT);
+
+	return !(((end_pfn > 0x00100000) && (end_pfn < 0x00200000))
+						|| end_pfn > 0x00280000);
 }
 
 #ifdef CONFIG_STRICT_DEVMEM
