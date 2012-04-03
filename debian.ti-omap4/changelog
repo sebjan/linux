@@ -1,3 +1,81 @@
+linux-ti-omap4 (3.3.0-1482.1) precise; urgency=low
+
+  [ Xavier Boudet ]
+
+  * UBUNTU: version 3.3.0-1482.1
+
+ -- Xavier Boudet <x-boudet@ti.com>  Wed, 11 Apr 2012 14:02:41 +0200
+
+linux-ti-omap4 (3.3.0-1482.0) precise; urgency=low
+
+  [ Xavier Boudet ]
+
+  * UBUNTU: version 3.3.0-1482.0 - New ABI
+
+ -- Xavier Boudet <x-boudet@ti.com>  Tue, 03 Apr 2012 10:22:48 +0200
+
+linux-ti-omap4 (3.3.0-1481.18) precise; urgency=low
+
+  [ Xavier Boudet ]
+
+  * UBUNTU: version 3.3.0-1481.18
+  * OMAP4460: Enable half L2 cache on 4460 ES1.0
+
+  [ Rob Clark ]
+
+  * staging: drm/omap: dmabuf/prime support
+
+ -- Xavier Boudet <x-boudet@ti.com>  Thu, 29 Mar 2012 09:04:01 +0200
+
+linux-ti-omap4 (3.3.0-1481.17) precise; urgency=low
+
+  [ Xavier Boudet ]
+
+  * UBUNTU: version 3.3.0-1481.17
+
+  [ Rob Clark ]
+
+  * dma-buf patches
+
+ -- Xavier Boudet <x-boudet@ti.com>  Tue, 27 Mar 2012 09:04:01 +0200
+
+linux-ti-omap4 (3.3.0-1481.16) precise; urgency=low
+
+  [ Xavier Boudet ]
+
+  * WIP, drm/omap rebase.
+
+ -- Xavier Boudet <x-boudet@ti.com>  Wed, 21 Mar 2012 19:04:01 +0100
+
+linux-ti-omap4 (3.3.0-1481.15) precise; urgency=low
+
+  [ Xavier Boudet ]
+
+  * HACK: use writeback dma buffers for gfx pipe
+
+ -- Xavier Boudet <x-boudet@ti.com>  Wed, 21 Mar 2012 19:04:01 +0100
+
+linux-ti-omap4 (3.3.0-1481.14) precise; urgency=low
+
+  [ Xavier Boudet ]
+
+  * Kernel 3.3 rebase
+
+ -- Xavier Boudet <x-boudet@ti.com>  Mon, 19 Mar 2012 09:04:01 +0100
+
+linux-ti-omap4 (3.3.0-1481.13) precise; urgency=low
+
+  [ Xavier Boudet ]
+
+  * Kernel 3.3-rc7 rebase
+  * Early integration of new Features:
+    - new drm driver
+    - remoteproc
+    - CMA
+    - rpmsg
+
+ -- Xavier Boudet <x-boudet@ti.com>  Fri, 16 Mar 2012 14:11:10 +0100
+
 linux-ti-omap4 (3.2.0-1406.8) precise; urgency=low
 
   [ Paolo Pisati ]
