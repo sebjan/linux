@@ -110,9 +110,9 @@ struct omap_gem_object {
 	 */
 	struct {
 		uint32_t write_pending;
-		volatile uint32_t write_complete;
+		uint32_t write_complete;
 		uint32_t read_pending;
-		volatile uint32_t read_complete;
+		uint32_t read_complete;
 	} *sync;
 
 	struct omap_gem_vm_ops *ops;
@@ -804,7 +804,6 @@ void *omap_gem_vaddr(struct drm_gem_object *obj)
  */
 
 struct omap_gem_sync_waiter {
-	bool sync;
 	struct list_head list;
 	struct omap_gem_object *omap_obj;
 	enum omap_gem_op op;
@@ -824,59 +823,34 @@ static LIST_HEAD(waiters);
 static inline bool is_waiting(struct omap_gem_sync_waiter *waiter)
 {
 	struct omap_gem_object *omap_obj = waiter->omap_obj;
-	if ((waiter->op & OMAP_GEM_WRITE) &&
+	if ((waiter->op & OMAP_GEM_READ) &&
 			(omap_obj->sync->read_complete < waiter->read_target))
 		return true;
-	if ((waiter->op & (OMAP_GEM_READ|OMAP_GEM_WRITE)) &&
+	if ((waiter->op & OMAP_GEM_WRITE) &&
 			(omap_obj->sync->write_complete < waiter->write_target))
 		return true;
 	return false;
 }
 
 /* macro for sync debug.. */
-#define SYNCDBG 1
-#define SYNC(str, waiter) do { if (SYNCDBG) \
-		printk(KERN_ERR "%s:%d: "str": %p (%d/%d/%d, %d/%d/%d)\n", \
-				__func__, __LINE__, (waiter)->omap_obj, \
-				(waiter)->omap_obj->sync->read_pending, \
-				(waiter)->omap_obj->sync->read_complete, \
-				(waiter)->read_target, \
-				(waiter)->omap_obj->sync->write_pending, \
-				(waiter)->omap_obj->sync->write_complete, \
-				(waiter)->write_target); \
+#define SYNCDBG 0
+#define SYNC(fmt, ...) do { if (SYNCDBG) \
+		printk(KERN_ERR "%s:%d: "fmt"\n", \
+				__func__, __LINE__, ##__VA_ARGS__); \
 	} while (0)
 
 
 static void sync_op_update(void)
 {
 	struct omap_gem_sync_waiter *waiter, *n;
-	LIST_HEAD(notified);
 	list_for_each_entry_safe(waiter, n, &waiters, list) {
 		if (!is_waiting(waiter)) {
 			list_del(&waiter->list);
-			if (waiter->sync) {
-				/* ugg! we need to dispatch with lock held... otherwise
-				 * in case of interrupted wait the waiter could be removed
-				 * from it's current list, which happens to be now the
-				 * 'notified' list, once the sync_lock is released..
-				 * There *must* be a less ugly way to do this..
-				 */
-				SYNC("notify", waiter);
-				waiter->notify(waiter->arg);
-			} else {
-				list_add_tail(&waiter->list, &notified);
-			}
+			SYNC("notify: %p", waiter);
+			waiter->notify(waiter->arg);
+			kfree(waiter);
 		}
 	}
-	spin_unlock(&sync_lock);
-	list_for_each_entry_safe(waiter, n, &notified, list) {
-		list_del(&waiter->list);
-		SYNC("notify", waiter);
-		waiter->notify(waiter->arg);
-		drm_gem_object_unreference_unlocked(&waiter->omap_obj->base);
-		kfree(waiter);
-	}
-	spin_lock(&sync_lock);
 }
 
 static inline int sync_op(struct drm_gem_object *obj,
@@ -961,7 +935,6 @@ int omap_gem_op_sync(struct drm_gem_object *obj, enum omap_gem_op op)
 			return -ENOMEM;
 		}
 
-		waiter->sync = true;
 		waiter->omap_obj = omap_obj;
 		waiter->op = op;
 		waiter->read_target = omap_obj->sync->read_pending;
@@ -971,28 +944,27 @@ int omap_gem_op_sync(struct drm_gem_object *obj, enum omap_gem_op op)
 
 		spin_lock(&sync_lock);
 		if (is_waiting(waiter)) {
-			SYNC("waited", waiter);
+			SYNC("waited: %p", waiter);
 			list_add_tail(&waiter->list, &waiters);
 			spin_unlock(&sync_lock);
 			ret = wait_event_interruptible(sync_event,
 					(waiter_task == NULL));
 			spin_lock(&sync_lock);
 			if (waiter_task) {
+				SYNC("interrupted: %p", waiter);
 				/* we were interrupted */
 				list_del(&waiter->list);
 				waiter_task = NULL;
-				/* but we might be finished anyways */
-				if (!is_waiting(waiter)) {
-					SYNC("interrupted, but finished", waiter);
-					ret = 0;
-				} else {
-					SYNC("interrupted", waiter);
-				}
+			} else {
+				/* freed in sync_op_update() */
+				waiter = NULL;
 			}
 		}
 		spin_unlock(&sync_lock);
 
-		kfree(waiter);
+		if (waiter) {
+			kfree(waiter);
+		}
 	}
 	return ret;
 }
@@ -1018,7 +990,6 @@ int omap_gem_op_async(struct drm_gem_object *obj, enum omap_gem_op op,
 			return -ENOMEM;
 		}
 
-		waiter->sync = false;
 		waiter->omap_obj = omap_obj;
 		waiter->op = op;
 		waiter->read_target = omap_obj->sync->read_pending;
@@ -1028,14 +999,13 @@ int omap_gem_op_async(struct drm_gem_object *obj, enum omap_gem_op op,
 
 		spin_lock(&sync_lock);
 		if (is_waiting(waiter)) {
-			drm_gem_object_reference(obj);
-			SYNC("waited", waiter);
+			SYNC("waited: %p", waiter);
 			list_add_tail(&waiter->list, &waiters);
 			spin_unlock(&sync_lock);
 			return 0;
 		}
+
 		spin_unlock(&sync_lock);
-		kfree(waiter);
 	}
 
 	/* no waiting.. */
