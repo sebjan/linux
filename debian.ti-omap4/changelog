@@ -1,3 +1,12 @@
+linux-ti-omap4 (3.3.0-1482.2) precise; urgency=low
+
+  [ Xavier Boudet ]
+
+  * UBUNTU: version 3.3.0-1482.2
+  * Config update
+
+ -- Xavier Boudet <x-boudet@ti.com>  Fri, 13 Apr 2012 18:02:41 +0200
+
 linux-ti-omap4 (3.3.0-1482.1) precise; urgency=low
 
   [ Xavier Boudet ]
