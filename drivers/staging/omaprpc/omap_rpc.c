@@ -1055,10 +1055,9 @@ static void omaprpc_driver_cb(struct rpmsg_channel *rpdev,
 }
 
 static struct rpmsg_device_id omaprpc_id_table[] = {
-    { .name = "omaprpc" },
-    { },
+		{ .name = "omaprpc" },
+		{ },
 };
-MODULE_DEVICE_TABLE(platform, omaprpc_id_table);
 
 static struct rpmsg_driver omaprpc_driver = {
     .drv.name   = KBUILD_MODNAME,
