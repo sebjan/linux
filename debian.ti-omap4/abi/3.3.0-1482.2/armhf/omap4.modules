@@ -677,7 +677,6 @@ i2400m
 i2400m-sdio
 i2400m-usb
 i2c-algo-pca
-i2c-dev
 i2c-diolan-u2c
 i2c-gpio
 i2c-mux
@@ -1049,6 +1048,7 @@ mtdram
 mtdswap
 mtouch
 multipath
+musb_hdrc
 mwifiex
 mwifiex_sdio
 mxl5005s
@@ -1163,8 +1163,11 @@ ocfs2_stack_o2cb
 ocfs2_stack_user
 ocfs2_stackglue
 old_belkin-sir
+omap2430
 omap_remoteproc
+omap_udc
 omapdce
+omaprpc
 omfs
 omninet
 onenand

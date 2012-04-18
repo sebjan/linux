@@ -1,3 +1,12 @@
+linux-ti-omap4 (3.3.0-1482.3) precise; urgency=low
+
+  [ Xavier Boudet ]
+
+  * UBUNTU: version 3.3.0-1482.3
+  * omaprpc (DVP) integration
+
+ -- Xavier Boudet <x-boudet@ti.com>  Wed, 18 Apr 2012 19:42:41 +0200
+
 linux-ti-omap4 (3.3.0-1482.2) precise; urgency=low
 
   [ Xavier Boudet ]
