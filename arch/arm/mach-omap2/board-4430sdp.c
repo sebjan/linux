@@ -485,6 +485,9 @@ static struct platform_device *sdp4430_devices[] __initdata = {
 	&sdp4430_leds_pwm,
 	&sdp4430_vbat,
 	&sdp4430_dmic_codec,
+	&sdp4430_abe_audio,
+	&sdp4430_v2v1,
+	&sdp4430_v1v8,
 };
 
 static struct omap_musb_board_data musb_board_data = {
