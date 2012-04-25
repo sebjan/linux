@@ -77,9 +77,6 @@
 #define FIXED_REG_V2V1_ID	2
 #define FIXED_REG_V1V8_ID	3
 
-static struct omap_board_config_kernel sdp4430_config[] __initdata = {
-};
-
 static const int sdp4430_keymap[] = {
 	KEY(0, 0, KEY_E),
 	KEY(0, 1, KEY_R),
@@ -488,6 +485,14 @@ static struct platform_device *sdp4430_devices[] __initdata = {
 	&sdp4430_abe_audio,
 	&sdp4430_v2v1,
 	&sdp4430_v1v8,
+};
+
+static struct omap_lcd_config sdp4430_lcd_config __initdata = {
+	.ctrl_name	= "internal",
+};
+
+static struct omap_board_config_kernel sdp4430_config[] __initdata = {
+	{ OMAP_TAG_LCD,		&sdp4430_lcd_config },
 };
 
 static struct omap_musb_board_data musb_board_data = {
@@ -1121,7 +1126,7 @@ static struct twl4030_platform_data sdp4430_twldata = {
 	/* Regulators */
 	.vusim		= &sdp4430_vusim,
 	.vaux1		= &sdp4430_vaux1,
-	.vaux3		= &sdp4430_vaux3,
+//	.vaux3		= &sdp4430_vaux3,
 };
 
 static struct i2c_board_info __initdata sdp4430_i2c_3_boardinfo[] = {
@@ -1203,6 +1208,20 @@ static void __init omap_sfh7741prox_init(void)
 	if (error < 0)
 		pr_err("%s:failed to request GPIO %d, error %d\n",
 			__func__, OMAP4_SFH7741_ENABLE_GPIO, error);
+}
+
+static void sdp4430_hdmi_mux_init(void)
+{
+	/* PAD0_HDMI_HPD_PAD1_HDMI_CEC */
+	omap_mux_init_signal("hdmi_hpd",
+			OMAP_PIN_INPUT_PULLUP);
+	omap_mux_init_signal("hdmi_cec",
+			OMAP_PIN_INPUT_PULLUP);
+	/* PAD0_HDMI_DDC_SCL_PAD1_HDMI_DDC_SDA */
+	omap_mux_init_signal("hdmi_ddc_scl",
+			OMAP_PIN_INPUT_PULLUP);
+	omap_mux_init_signal("hdmi_ddc_sda",
+			OMAP_PIN_INPUT_PULLUP);
 }
 
 static struct gpio sdp4430_hdmi_gpios[] = {
@@ -1427,6 +1446,7 @@ static void __init omap_4430sdp_display_init(void)
 		pr_err("%s: Could not get display_sel GPIO\n", __func__);
 
 	sdp4430_lcd_init();
+	sdp4430_hdmi_mux_init();
 	sdp4430_picodlp_init();
 	omap_display_init(&sdp4430_dss_data);
 	/*
