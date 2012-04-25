@@ -1134,8 +1134,42 @@ static struct i2c_board_info __initdata sdp4430_i2c_4_boardinfo[] = {
 		I2C_BOARD_INFO("hmc5843", 0x1e),
 	},
 };
+
+static void __init omap_i2c_hwspinlock_init(int bus_id, int spinlock_id,
+					struct omap_i2c_bus_board_data *pdata)
+{
+	/* spinlock_id should be -1 for a generic lock request */
+	if (spinlock_id < 0)
+		pdata->handle = hwspin_lock_request();
+	else
+		pdata->handle = hwspin_lock_request_specific(spinlock_id);
+
+	if (pdata->handle != NULL) {
+		pdata->hwspin_lock_timeout = hwspin_lock_timeout;
+		pdata->hwspin_unlock = hwspin_unlock;
+	} else {
+		pr_err("I2C hwspinlock request failed for bus %d\n", bus_id);
+	}
+}
+
+static struct omap_i2c_bus_board_data __initdata sdp4430_i2c_1_bus_pdata;
+static struct omap_i2c_bus_board_data __initdata sdp4430_i2c_2_bus_pdata;
+static struct omap_i2c_bus_board_data __initdata sdp4430_i2c_3_bus_pdata;
+static struct omap_i2c_bus_board_data __initdata sdp4430_i2c_4_bus_pdata;
+
 static int __init omap4_i2c_init(void)
 {
+
+	omap_i2c_hwspinlock_init(1, 0, &sdp4430_i2c_1_bus_pdata);
+	omap_i2c_hwspinlock_init(2, 1, &sdp4430_i2c_2_bus_pdata);
+	omap_i2c_hwspinlock_init(3, 2, &sdp4430_i2c_3_bus_pdata);
+	omap_i2c_hwspinlock_init(4, 3, &sdp4430_i2c_4_bus_pdata);
+
+	omap_register_i2c_bus_board_data(1, &sdp4430_i2c_1_bus_pdata);
+	omap_register_i2c_bus_board_data(2, &sdp4430_i2c_2_bus_pdata);
+	omap_register_i2c_bus_board_data(3, &sdp4430_i2c_3_bus_pdata);
+	omap_register_i2c_bus_board_data(4, &sdp4430_i2c_4_bus_pdata);
+
 	omap4_pmic_get_config(&sdp4430_twldata, TWL_COMMON_PDATA_USB,
 			TWL_COMMON_REGULATOR_VDAC |
 			TWL_COMMON_REGULATOR_VAUX2 |
@@ -1532,11 +1566,17 @@ static void __init omap_4430sdp_init(void)
 	}
 }
 
+static void __init omap_4430sdp_map_io(void)
+{
+	omap2_set_globals_443x();
+	omap44xx_map_common_io();
+}
+
 MACHINE_START(OMAP_4430SDP, "OMAP4430 4430SDP board")
 	/* Maintainer: Santosh Shilimkar - Texas Instruments Inc */
 	.atag_offset	= 0x100,
 	.reserve	= omap_reserve,
-	.map_io		= omap4_map_io,
+	.map_io		= omap_4430sdp_map_io,
 	.init_early	= omap4430_init_early,
 	.init_irq	= gic_init_irq,
 	.handle_irq	= gic_handle_irq,
