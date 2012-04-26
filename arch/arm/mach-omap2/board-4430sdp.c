@@ -68,6 +68,11 @@
 #define DISPLAY_SEL_GPIO	59	/* LCD2/PicoDLP switch */
 #define DLP_POWER_ON_GPIO	40
 
+/* PWM2 and TOGGLE3 register offsets */
+#define LED_PWM2ON		0x03
+#define LED_PWM2OFF		0x04
+#define TWL6030_TOGGLE3		0x92
+
 #define GPIO_WIFI_PMENA		54
 #define GPIO_WIFI_IRQ		53
 
@@ -1434,6 +1439,15 @@ static struct omap_dss_board_info sdp4430_dss_data = {
 	.devices	= sdp4430_dss_devices,
 	.default_device	= &sdp4430_lcd_device,
 };
+
+static int omap_4430sdp_hack_backlight(void)
+{
+	twl_i2c_write_u8(TWL_MODULE_PWM, 0x7f, LED_PWM2OFF);
+	twl_i2c_write_u8(TWL_MODULE_PWM, 0x7f, LED_PWM2ON);
+	twl_i2c_write_u8(TWL6030_MODULE_ID1, 0x30, TWL6030_TOGGLE3);
+	return 0;
+}
+late_initcall(omap_4430sdp_hack_backlight);
 
 static void __init omap_4430sdp_display_init(void)
 {
