@@ -767,8 +767,10 @@ static void dss_apply_irq_handler(void *data, u32 mask)
 	if (!extra_updating)
 		complete_all(&extra_updated_completion);
 
-	if (!need_isr())
-		dss_unregister_vsync_isr();
+// poor hack to avoid a WARN_ON in dss_unregister_vsync_isr()
+// to be fixed properly 
+//	if (!need_isr())
+//		dss_unregister_vsync_isr();
 
 	spin_unlock(&data_lock);
 }
