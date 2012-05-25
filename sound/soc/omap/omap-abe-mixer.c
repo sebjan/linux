@@ -354,7 +354,7 @@ static int abe_put_switch(struct snd_kcontrol *kcontrol,
 	struct soc_mixer_control *mc =
 		(struct soc_mixer_control *)kcontrol->private_value;
 
-//	pm_runtime_get_sync(abe->dev);
+	pm_runtime_get_sync(abe->dev);
 
 	if (ucontrol->value.integer.value[0]) {
 		abe->opp.widget[mc->reg] |= ucontrol->value.integer.value[0]<<mc->shift;
@@ -363,7 +363,7 @@ static int abe_put_switch(struct snd_kcontrol *kcontrol,
 		abe->opp.widget[mc->reg] &= ~(0x1<<mc->shift);
 		snd_soc_dapm_mixer_update_power(widget, kcontrol, 0);
 	}
-//	pm_runtime_put_sync(abe->dev);
+	pm_runtime_put_sync(abe->dev);
 
 	return 1;
 }
@@ -377,11 +377,11 @@ static int volume_put_mixer(struct snd_kcontrol *kcontrol,
 	struct soc_mixer_control *mc =
 		(struct soc_mixer_control *)kcontrol->private_value;
 
-//	pm_runtime_get_sync(abe->dev);
+	pm_runtime_get_sync(abe->dev);
 
 	omap_aess_write_mixer(abe->aess, mc->reg, abe_val_to_gain(ucontrol->value.integer.value[0]));
 
-//	pm_runtime_put_sync(abe->dev);
+	pm_runtime_put_sync(abe->dev);
 
 	return 1;
 }
@@ -414,10 +414,10 @@ static int volume_get_mixer(struct snd_kcontrol *kcontrol,
 		(struct soc_mixer_control *)kcontrol->private_value;
 	u32 val;
 
-//	pm_runtime_get_sync(abe->dev);
+	pm_runtime_get_sync(abe->dev);
 	omap_aess_read_mixer(abe->aess, mc->reg, &val);
 	ucontrol->value.integer.value[0] = abe_gain_to_val(val);
-//	pm_runtime_put_sync(abe->dev);
+	pm_runtime_put_sync(abe->dev);
 
 	return 0;
 }
