@@ -174,7 +174,7 @@ static int put_mixer(struct snd_kcontrol *kcontrol,
 	struct soc_mixer_control *mc =
 		(struct soc_mixer_control *)kcontrol->private_value;
 
-	pm_runtime_get_sync(abe->dev);
+//	pm_runtime_get_sync(abe->dev);
 
 	if (ucontrol->value.integer.value[0]) {
 		abe->opp.widget[mc->reg] |= ucontrol->value.integer.value[0]<<mc->shift;
@@ -186,7 +186,7 @@ static int put_mixer(struct snd_kcontrol *kcontrol,
 		omap_aess_disable_gain(abe->aess, mc->reg);
 	}
 
-	pm_runtime_put_sync(abe->dev);
+//	pm_runtime_put_sync(abe->dev);
 	return 1;
 }
 
