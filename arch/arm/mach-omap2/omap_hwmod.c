@@ -807,9 +807,11 @@ static int _omap4_disable_module(struct omap_hwmod *oh)
 				    oh->prcm.omap4.clkctrl_offs);
 
 	v = _omap4_wait_target_disable(oh);
-	if (v)
+	if (v) {
 		pr_warn("omap_hwmod: %s: _wait_target_disable failed\n",
 			oh->name);
+		dump_stack();
+	}
 
 	return 0;
 }
