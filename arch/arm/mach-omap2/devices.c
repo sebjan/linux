@@ -996,6 +996,44 @@ static struct omap_device_pm_latency omap_drm_latency[] = {
 	},
 };
 
+/**
+ * change_clock_parent - try to change a clock's parent
+ * @dev: device pointer to change parent
+ * @name: string containing the new requested parent's name
+ */
+static int change_clock_parent(struct device *dev, char *name)
+{
+	int ret;
+	struct clk *fclk, *parent;
+
+	fclk = clk_get(dev, "fck");
+	if (IS_ERR_OR_NULL(fclk)) {
+		dev_err(dev, "%s: %d: clk_get() FAILED\n",
+				__func__, __LINE__);
+		return -EINVAL;
+	}
+
+	parent = clk_get(dev, name);
+	if (IS_ERR_OR_NULL(parent)) {
+		dev_err(dev, "%s: %d: clk_get() %s FAILED\n",
+			__func__, __LINE__, name);
+		clk_put(fclk);
+		return -EINVAL;
+	}
+
+	ret = clk_set_parent(fclk, parent);
+	if (IS_ERR_VALUE(ret)) {
+		dev_err(dev, "%s: clk_set_parent() to %s FAILED\n",
+			__func__, name);
+		ret = -EINVAL;
+	}
+
+	clk_put(parent);
+	clk_put(fclk);
+
+	return ret;
+}
+
 static void omap_init_gpu(void)
 {
 	struct omap_hwmod *oh;
@@ -1026,6 +1064,11 @@ static void omap_init_gpu(void)
 			     omap_drm_latency, ARRAY_SIZE(omap_drm_latency), 0);
 	WARN(IS_ERR(od), "Could not build omap_device for %s %s\n",
 	     name, oh_name);
+
+	if (od && cpu_is_omap44xx()) {
+		change_clock_parent(&((*od).dev), "dpll_per_m7x2_ck");
+		pr_info("Updated GPU clock source to be dpll_per_m7x2_ck\n");
+	}
 
 	kfree(pdata);
 }
