@@ -66,7 +66,7 @@ EXPORT_SYMBOL_GPL(clockevent_delta2ns);
 void clockevents_set_mode(struct clock_event_device *dev,
 				 enum clock_event_mode mode)
 {
-	if (dev->mode != mode) {
+//	if (dev->mode != mode) {
 		dev->set_mode(mode, dev);
 		dev->mode = mode;
 
@@ -80,7 +80,7 @@ void clockevents_set_mode(struct clock_event_device *dev,
 				WARN_ON(1);
 			}
 		}
-	}
+//	}
 }
 
 /**
