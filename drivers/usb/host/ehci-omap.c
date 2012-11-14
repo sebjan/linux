@@ -44,6 +44,7 @@
 #include <linux/pm_runtime.h>
 #include <linux/gpio.h>
 #include <plat/omap-pm.h>
+#include <linux/pm_qos.h>
 
 /* EHCI Register Set */
 #define EHCI_INSNREG04					(0xA0)
@@ -57,6 +58,7 @@
 #define	EHCI_INSNREG05_ULPI_WRDATA_SHIFT		0
 
 /*-------------------------------------------------------------------------*/
+static struct pm_qos_request pm_tput_qos_request;
 
 static const struct hc_driver ehci_omap_hc_driver;
 
@@ -622,6 +624,8 @@ static int ehci_hcd_omap_probe(struct platform_device *pdev)
 		udelay(10);
 	}
 
+	pm_qos_add_request(&pm_tput_qos_request, PM_QOS_MEMORY_THROUGHPUT,
+							200*1000*4);
 	pm_runtime_enable(dev);
 	pm_runtime_get_sync(dev);
 
@@ -690,6 +694,8 @@ err_add_hcd:
 	disable_put_regulator(pdata);
 	pm_runtime_put_sync(dev);
 
+	pm_qos_remove_request(&pm_tput_qos_request);
+
 	if (pdata->phy_reset) {
 		if (gpio_is_valid(pdata->reset_gpio_port[0]))
 			gpio_free(pdata->reset_gpio_port[0]);
@@ -730,6 +736,8 @@ static int ehci_hcd_omap_remove(struct platform_device *pdev)
 	pm_runtime_put_sync(dev);
 	pm_runtime_disable(dev);
 
+	pm_qos_remove_request(&pm_tput_qos_request);
+
 	if (pdata->phy_reset) {
 		if (gpio_is_valid(pdata->reset_gpio_port[0]))
 			gpio_free(pdata->reset_gpio_port[0]);
@@ -764,9 +772,8 @@ static int ehci_omap_bus_suspend(struct usb_hcd *hcd)
 
 	pm_runtime_put(dev);
 
-	omap_pm_set_min_bus_tput(dev,
-			OCP_INITIATOR_AGENT,
-			-1);
+	pm_qos_update_request(&pm_tput_qos_request, 0);
+
 	return ret;
 }
 
@@ -779,9 +786,7 @@ static int ehci_omap_bus_resume(struct usb_hcd *hcd)
 	if (pm_runtime_suspended(dev))
 		pm_runtime_get_sync(dev);
 
-	omap_pm_set_min_bus_tput(dev,
-			OCP_INITIATOR_AGENT,
-			(200*1000*4));
+	pm_qos_update_request(&pm_tput_qos_request, 200*1000*4);
 
 	return ehci_bus_resume(hcd);
 }
