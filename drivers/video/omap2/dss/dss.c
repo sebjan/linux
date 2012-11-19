@@ -31,6 +31,7 @@
 #include <linux/clk.h>
 #include <linux/platform_device.h>
 #include <linux/pm_runtime.h>
+#include <linux/pm_qos.h>
 
 #include <video/omapdss.h>
 
@@ -61,6 +62,8 @@ struct dss_reg {
 
 #define REG_FLD_MOD(idx, val, start, end) \
 	dss_write_reg(idx, FLD_MOD(dss_read_reg(idx), val, start, end))
+
+static struct pm_qos_request pm_tput_qos_request;
 
 static int dss_runtime_get(void);
 static void dss_runtime_put(void);
@@ -858,7 +861,7 @@ static int __exit omap_dsshw_remove(struct platform_device *pdev)
 static int dss_runtime_suspend(struct device *dev)
 {
 	dss_save_context();
-	dss_set_min_bus_tput(dev, 0);
+	pm_qos_update_request(&pm_tput_qos_request, 0);
 	return 0;
 }
 
@@ -871,10 +874,7 @@ static int dss_runtime_resume(struct device *dev)
 	 * without any tput requirements, but that is not currently possible
 	 * via the PM layer.
 	 */
-
-	r = dss_set_min_bus_tput(dev, 1000000000);
-	if (r)
-		return r;
+	pm_qos_update_request(&pm_tput_qos_request, 200*1000*4);
 
 	dss_restore_context();
 	return 0;
@@ -896,10 +896,15 @@ static struct platform_driver omap_dsshw_driver = {
 
 int __init dss_init_platform_driver(void)
 {
+	pm_qos_add_request(&pm_tput_qos_request, PM_QOS_MEMORY_THROUGHPUT,
+							0);
+
 	return platform_driver_probe(&omap_dsshw_driver, omap_dsshw_probe);
 }
 
 void dss_uninit_platform_driver(void)
 {
+	pm_qos_remove_request(&pm_tput_qos_request);
+
 	platform_driver_unregister(&omap_dsshw_driver);
 }
