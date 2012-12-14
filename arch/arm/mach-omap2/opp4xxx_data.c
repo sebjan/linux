@@ -28,6 +28,7 @@
 #include "omap_opp_data.h"
 #include "pm.h"
 #include "abb.h"
+#include "dvfs.h"
 
 /*
  * STD_FUSE_OPP_DPLL_1 contains info about ABB trim type for MPU/IVA.
@@ -546,3 +547,20 @@ int __init omap4_opp_init(void)
 	return r;
 }
 device_initcall(omap4_opp_init);
+
+int omap4_iva_opp_constraint(void)
+{
+	int err;
+
+	if (!cpu_is_omap44xx())
+		return -ENODEV;
+
+	/* Request IVA domain OPP100 */
+	err = omap_device_scale(omap_hwmod_name_get_dev("iva"),
+				omap_hwmod_name_get_dev("iva"),
+				260000000);
+	pr_info(" Forced IVA domain to OPP100\n");
+
+	return err;
+}
+late_initcall(omap4_iva_opp_constraint);
