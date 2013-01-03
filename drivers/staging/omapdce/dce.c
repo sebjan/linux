@@ -21,8 +21,12 @@
 #include <linux/types.h>
 #include <linux/rpmsg.h>
 #include <linux/pm_runtime.h>
+#include <linux/mutex.h>
+#include <linux/timer.h>
+#include <linux/debugfs.h>
 #include <plat/omap-pm.h>
 #include <plat/clock.h>
+#include "../../arch/arm/mach-omap2/dvfs.h"
 
 #include "../omapdrm/omap_drm.h"
 #include "../omapdrm/omap_drv.h"
@@ -145,6 +149,240 @@ static void dce_pm_runtime_put_sync(void)
 	int i;
 	for (i = (NB_PM_DEVICES - 1); i >= 0; i--)
 		pm_runtime_put_sync(dce_pm_device_list[i].dev);
+}
+
+/* DCE OPP control
+ * Requests a high OPP ('constraint') for IVA. To be used when
+ * decoding video to ensure IVAHD is running fast enough.
+ * Please use following functions where appropriate:
+ *  iva_opp_get() / iva_opp_put()
+ * Uses a timeout mechanism to delay the release of the high-OPP,
+ * in order to reduce the OPP transition requests.
+ * Supports multiple concurrent video decode.
+ * Supports 2 different IVA OPPs:
+ *  nominal: selected for 1 video decode
+ *  maximum: selected above 1 video decode
+ * Try to handle the various video process killed cases by using the
+ * codec_(un)register entry points for doing the get/put.
+ * (Video can be interrupted by stopping of killing the app, and behavior
+ * can be different)
+ */
+#define IVA_NOM_SPEED_HZ	260000000 /* Nominal IVAHD speed */
+#define IVA_MAX_SPEED_HZ	500000000 /* Max IVAHD speed */
+#define IVA_TIMER_DELAY	(1*HZ)		/* 1s */
+
+enum iva_opp_state {
+	IVA_OPP_RELAXED,
+	IVA_OPP_NOM,
+	IVA_OPP_MAX
+};
+/**
+ * struct dce_opp_ctrl - everything needed for IVAHD OPP control
+ * @count:	IVAHD usage count
+ * @timer:	timeout before releasing the OPP constraint
+ * @lock:	protects count, enabled and OPP setting
+ * @state:	reflexts state of running IVAHD OPP
+ * @enabled:	true if service is enabled
+ * @workq:	for deferring scaling down processing
+ */
+struct dce_opp_ctrl {
+	int count;
+	struct timer_list timer;
+	struct mutex lock;
+	enum iva_opp_state state;
+	unsigned int enabled;
+	struct work_struct workq;
+};
+static struct dce_opp_ctrl opp_ctrl;
+
+bool iva_opp_prg_required(enum iva_opp_state state, int count)
+{
+	if ((count == 0 && state != IVA_OPP_RELAXED) ||
+		(count == 1 && state != IVA_OPP_NOM) ||
+		(count >= 2 && state != IVA_OPP_MAX) ||
+		(count < 0))
+		return true;
+	else
+		return false;
+}
+
+/**
+ * iva_opp_scale - program proper opp depending on opp_ctrl.count value
+ *
+ * Also aligns opp_ctrl.state to reflect running OPP
+ * WARNING:
+ *  - Requires to run with opp_ctr.lock held!
+ *  - Needs to run in a process context: mutexes are used
+ *  (in omap_device_scale)
+ * Using this function for scaling enforces the same order for the
+ * 2 mutexes used (opp_ctrl.lock and omap_device_scale).
+ */
+static void iva_opp_scale(void)
+{
+	int err;
+	enum iva_opp_state next_state;
+
+	if (opp_ctrl.count < 0) {
+		pr_err("%s: counter management error!\n", __func__);
+		opp_ctrl.count = 0;
+	}
+
+	switch (opp_ctrl.count) {
+	case 0:
+		err = omap_device_scale(omap_hwmod_name_get_dev("iva"),
+				omap_hwmod_name_get_dev("iva"),
+				0);
+		next_state = IVA_OPP_RELAXED;
+		break;
+	case 1:
+		err = omap_device_scale(omap_hwmod_name_get_dev("iva"),
+				omap_hwmod_name_get_dev("iva"),
+				IVA_NOM_SPEED_HZ);
+		next_state = IVA_OPP_NOM;
+		break;
+	default:
+		err = omap_device_scale(omap_hwmod_name_get_dev("iva"),
+				omap_hwmod_name_get_dev("iva"),
+				IVA_MAX_SPEED_HZ);
+		next_state = IVA_OPP_MAX;
+		break;
+	}
+
+	if (err) {
+		pr_err("%s: error updating IVA OPP constraint: %d (count: %d, state: %d)\n",
+			__func__, err, opp_ctrl.count, opp_ctrl.state);
+	} else {
+		pr_debug("%s: updated IVA OPP: %d => %d\n", __func__,
+					opp_ctrl.state, next_state);
+		opp_ctrl.state = next_state;
+	}
+}
+
+static void opp_timer(unsigned long data)
+{
+	if (!schedule_work(&opp_ctrl.workq))
+		pr_info("%s: scheduling work already pending!\n",
+							__func__);
+	else
+		pr_debug("%s: scheduling work\n", __func__);
+}
+
+static void iva_opp_work(struct work_struct *work)
+{
+	if (!mutex_lock_interruptible(&opp_ctrl.lock)) {
+		if (iva_opp_prg_required(opp_ctrl.state, opp_ctrl.count))
+			iva_opp_scale();
+		else
+			pr_debug("%s: useless worker, not scaling down! ((%d, %d)\n",
+				__func__, opp_ctrl.state, opp_ctrl.count);
+		mutex_unlock(&opp_ctrl.lock);
+	}
+}
+
+/**
+ * iva_opp_get() - request IVAHD to be clocked at high speed
+ *
+ * Increments usage count and update OPP if necessary
+ * Must be called from process context!
+ */
+static void iva_opp_get(void)
+{
+	int err;
+	if (opp_ctrl.enabled &&
+		!mutex_lock_interruptible(&opp_ctrl.lock)) {
+		opp_ctrl.count++;
+		if (iva_opp_prg_required(opp_ctrl.state, opp_ctrl.count))
+			iva_opp_scale();
+		mutex_unlock(&opp_ctrl.lock);
+
+		err = del_timer(&opp_ctrl.timer);
+		pr_debug("%s: trying to stop timer (if ever needed): %d\n",
+						__func__, err);
+	}
+}
+
+/**
+ * iva_opp_put() - Release IVAHD ressource
+ *
+ * Decrements usage count and trigger delayed OPP update if necessary
+ * Must be called from process context!
+ */
+static void iva_opp_put(void)
+{
+	int err;
+	int trig_opp_chg = false;
+	if (!mutex_lock_interruptible(&opp_ctrl.lock)) {
+		opp_ctrl.count--;
+		trig_opp_chg = iva_opp_prg_required(opp_ctrl.state,
+							opp_ctrl.count);
+		mutex_unlock(&opp_ctrl.lock);
+	}
+	if (trig_opp_chg) {
+		err = mod_timer(&opp_ctrl.timer,
+				jiffies + IVA_TIMER_DELAY);
+		pr_debug("%s: (re-)starting timer: %d\n",
+					__func__, err);
+	}
+}
+
+#ifdef CONFIG_DEBUG_FS
+static struct dentry *debugfs_dir;
+static ssize_t opp_dbg_write(struct file *file, const char __user *buf,
+					size_t size, loff_t *offset)
+{
+	char d;
+	if (!copy_from_user(&d, buf, 1)) {
+		switch (d) {
+		case 'u':
+			pr_info("opp iva: DEBUG request IVAHD OPP\n");
+			iva_opp_get();
+			break;
+		case 'd':
+		default:
+			pr_info("opp iva: DEBUG release IVAHD OPP\n");
+			iva_opp_put();
+			break;
+		}
+	}
+	return size;
+}
+
+static const struct file_operations opp_debug_fops = {
+	.write = opp_dbg_write,
+};
+#endif
+
+static void iva_opp_init(void)
+{
+	opp_ctrl.count = 0;
+	opp_ctrl.state = IVA_OPP_RELAXED;
+	init_timer(&opp_ctrl.timer);
+	opp_ctrl.timer.function = opp_timer;
+	opp_ctrl.timer.data = (unsigned long) &opp_ctrl;
+	mutex_init(&opp_ctrl.lock);
+	INIT_WORK(&opp_ctrl.workq, iva_opp_work);
+#ifdef CONFIG_DEBUG_FS
+	debugfs_dir = debugfs_create_dir("iva_opp", NULL);
+	debugfs_create_u32("state", S_IRUGO | S_IWUGO,
+				debugfs_dir, &opp_ctrl.state);
+	debugfs_create_u32("count", S_IRUGO | S_IWUGO,
+				debugfs_dir, &opp_ctrl.count);
+	debugfs_create_u32("enabled", S_IRUGO | S_IWUGO,
+				debugfs_dir, &opp_ctrl.enabled);
+	debugfs_create_file("scale", S_IWUGO,
+				debugfs_dir, &opp_ctrl, &opp_debug_fops);
+#endif
+	opp_ctrl.enabled = true;
+}
+
+static void iva_opp_remove(void)
+{
+#ifdef CONFIG_DEBUG_FS
+	debugfs_remove_recursive(debugfs_dir);
+#endif
+	cancel_work_sync(&opp_ctrl.workq);
+	del_timer(&opp_ctrl.timer);
+	opp_ctrl.enabled = false;
 }
 
 /*
@@ -368,6 +606,7 @@ static uint32_t codec_register(struct dce_file_priv *priv, uint32_t codec,
 		enum omap_dce_codec codec_id, enum dce_codec_quirks quirks)
 {
 	int i;
+	iva_opp_get();
 	for (i = 0; i < ARRAY_SIZE(priv->codecs); i++) {
 		if (!priv->codecs[i].codec) {
 			priv->codecs[i].codec_id = codec_id;
@@ -383,6 +622,7 @@ static uint32_t codec_register(struct dce_file_priv *priv, uint32_t codec,
 static void codec_unregister(struct dce_file_priv *priv,
 		uint32_t codec_handle)
 {
+	iva_opp_put();
 	codec_unlockbuf(priv, codec_handle, 0);
 	priv->codecs[codec_handle-1].codec = 0;
 	priv->codecs[codec_handle-1].codec_id = 0;
@@ -1356,12 +1596,14 @@ static struct rpmsg_driver rpmsg_driver = {
 static int __init omap_dce_init(void)
 {
 	DBG("");
+	iva_opp_init();
 	return register_rpmsg_driver(&rpmsg_driver);
 }
 
 static void __exit omap_dce_fini(void)
 {
 	DBG("");
+	iva_opp_remove();
 	unregister_rpmsg_driver(&rpmsg_driver);
 }
 
